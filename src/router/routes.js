@@ -4,9 +4,8 @@ const routes = [
     component: () => import('layouts/MainLayout.vue'),
     children: [
       { path: '', redirect: '/login' },
-      { path: 'home', name: 'home', component: () => import('pages/IndexPage.vue') },
-      { path: 'login', name: 'login', component: () => import('pages/LoginPage.vue') },
-      { path: 'vehicle-profile', name: 'vehicle-profile', component: () => import('pages/VehicleProfile.vue') }
+      { path: 'login', component: () => import('pages/LoginPage.vue') },
+      { path: 'home', component: () => import('pages/IndexPage.vue') },
     ]
   },
 
