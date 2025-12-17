@@ -41,6 +41,11 @@ export default defineConfig((/* ctx */) => {
       },
 
       vueRouterMode: 'hash', // available values: 'hash', 'history'
+        env: {
+          QUASAR_PUBLIC_GOOGLE_CLIENT_ID: process.env.QUASAR_PUBLIC_GOOGLE_CLIENT_ID,
+          QUASAR_PUBLIC_BACKEND_URL: process.env.QUASAR_PUBLIC_BACKEND_URL,
+          VITE_WEB_SOCKET_API_URL: process.env.VITE_WEB_SOCKET_API_URL
+        }
       // vueRouterBase,
       // vueDevtools,
       // vueOptionsAPI: false,
