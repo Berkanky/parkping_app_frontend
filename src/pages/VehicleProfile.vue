@@ -1,7 +1,7 @@
 <template>
     <div>
-        <q-input v-model="this.conversation_message" v-on:keyup.enter="watch_user_message()"></q-input>
-    </div>
+<!--         <q-input v-model="this.conversation_message" v-on:keyup.enter="watch_user_message()"></q-input>
+ -->    </div>
 </template>
 
 <script>

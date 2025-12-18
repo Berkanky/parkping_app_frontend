@@ -1,7 +1,7 @@
 <template>
     <div>
-        test
-        <GoogleLoginComponent />
+        test<!-- 
+        <GoogleLoginComponent /> -->
     </div>
 </template>
 
