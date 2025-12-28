@@ -12,6 +12,7 @@ export default defineConfig((/* ctx */) => {
     // --> boot files are part of "main.js"
     // https://v2.quasar.dev/quasar-cli-vite/boot-files
     boot: [
+      'auth'
     ],
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#css
@@ -42,8 +43,8 @@ export default defineConfig((/* ctx */) => {
 
       vueRouterMode: 'hash', // available values: 'hash', 'history'
         env: {
-          QUASAR_PUBLIC_GOOGLE_CLIENT_ID: process.env.QUASAR_PUBLIC_GOOGLE_CLIENT_ID,
-          QUASAR_PUBLIC_BACKEND_URL: process.env.QUASAR_PUBLIC_BACKEND_URL,
+          VITE_PUBLIC_GOOGLE_CLIENT_ID: process.env.VITE_PUBLIC_GOOGLE_CLIENT_ID,
+          VITE_BACKEND_URL: process.env.VITE_BACKEND_URL,
           VITE_WEB_SOCKET_API_URL: process.env.VITE_WEB_SOCKET_API_URL
         },
       // vueRouterBase,

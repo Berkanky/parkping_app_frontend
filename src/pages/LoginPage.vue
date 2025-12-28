@@ -1,7 +1,6 @@
 <template>
     <div>
-        test<!-- 
-        <GoogleLoginComponent /> -->
+        <GoogleLoginComponent /> 
     </div>
 </template>
 

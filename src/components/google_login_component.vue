@@ -27,18 +27,16 @@ export default {
 
   computed: {
     GOOGLE_CLIENT_ID() {
-      return process.env.QUASAR_PUBLIC_GOOGLE_CLIENT_ID;
+      return import.meta.env.VITE_PUBLIC_GOOGLE_CLIENT_ID;
     },
     BACKEND_URL() {
-      return process.env.QUASAR_PUBLIC_BACKEND_URL;
+      return import.meta.env.VITE_BACKEND_URL;
     },
   },
 
   methods: {
     async google_verify_service(id_token) {
-      var response = await axios.post(`${this.BACKEND_URL}/auth/google`, {
-        id_token: id_token,
-      });
+      var response = await axios.post(`${this.BACKEND_URL}/auth/google`, { id_token: id_token }, { withCredentials: true });
       return response.status === 200;
     },
     initGoogle() {
@@ -85,7 +83,7 @@ export default {
 
     async handleCredentialResponse(response) {
       var idToken = response.credential;
-
+      console.log("idToken -> " + idToken);
       if (!idToken) {
         this.$q.notify({
           type: "negative",
@@ -100,10 +98,14 @@ export default {
         var ok = await this.google_verify_service(idToken);
 
         if (ok) {
+
           this.$q.notify({
             type: "positive",
             message: "Giriş başarılı.",
           });
+
+          this.$router.push({name:'home'});
+
         } else {
           this.$q.notify({
             type: "negative",
