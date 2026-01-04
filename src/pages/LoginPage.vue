@@ -2,9 +2,7 @@
   <q-page class="login-page">
     <div class="screen">
       <div class="hero">
-        <div class="green-corner green-left"></div>
-        <div class="green-corner green-right"></div>
-        <q-img class="hero-img" src="../images/login_screen_image.svg" fit="cover" no-spinner />
+        <q-img class="hero-img" src="../images/login_screen_image_v2.svg" fit="cover" no-spinner />
       </div>
 
       <div class="panel">
@@ -21,7 +19,7 @@
           <div class="actions">
             <google_login_component />
 
-            <q-btn class="btn apple-btn" unelevated no-caps @click="onApple">
+            <!-- <q-btn class="btn apple-btn" unelevated no-caps @click="onApple">
               <div class="btn-inner">
                 <span class="btn-icon">
                   <svg width="18" height="18" viewBox="0 0 384 512" aria-hidden="true">
@@ -31,7 +29,7 @@
                 </span>
                 <span class="btn-text">Continue with Apple</span>
               </div>
-            </q-btn>
+            </q-btn> -->
 
             <div class="legal">
               By continuing, you agree to our Term of Service and Privacy Policy.
@@ -86,25 +84,6 @@ export default {
 
 .hero-img {
   height: 56vh;
-}
-
-.green-corner {
-  position: absolute;
-  top: 0;
-  width: 64px;
-  height: 64px;
-  background: #28ff7a;
-  z-index: 2;
-}
-
-.green-left {
-  left: 0;
-  clip-path: polygon(0 0, 100% 0, 0 100%);
-}
-
-.green-right {
-  right: 0;
-  clip-path: polygon(0 0, 100% 0, 100% 100%);
 }
 
 .panel {

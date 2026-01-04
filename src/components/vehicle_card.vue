@@ -19,7 +19,7 @@
             <template v-slot:error>
               <div class="pp-img-ph">
                 <q-icon name="directions_car" size="28px" />
-                <div class="pp-img-ph-text">Foto yok</div>
+                <div class="pp-img-ph-text">No Picture</div>
               </div>
             </template>
 
@@ -34,17 +34,17 @@
       </q-item-section>
 
       <q-item-section class="pp-content">
-        <div class="pp-title">{{ make }} {{ model }}</div>
-        <div class="pp-subtitle">{{ color }}</div>
+        <div class="pp-title text-white">{{ make }}</div>
+        <div class="pp-subtitle text-grey-6">{{ model }} - {{ color }}</div>
 
-        <div class="pp-plate">
+        <div class="pp-plate text-white">
           <q-icon name="badge" size="16px" class="pp-plate-icon" />
           <div class="pp-plate-text">{{ plate }}</div>
         </div>
       </q-item-section>
 
       <q-item-section side class="pp-side" aria-hidden="true">
-        <q-icon name="chevron_right" class="pp-right-icon" />
+        <q-icon name="chevron_right" class="pp-right-icon text-white" />
       </q-item-section>
     </q-item>
   </q-card>
@@ -82,15 +82,15 @@ export default {
 <style scoped>
 .pp-vehicle-card {
   width: 100%;
-  border-radius: 22px;
-  background: #fff;
+  border-radius: 10px;
+  background: #24242b;
   border: 1px solid rgba(17, 24, 39, 0.06);
   box-shadow: 0 10px 28px rgba(17, 24, 39, 0.06);
   overflow: hidden;
 }
 
 .pp-item {
-  padding: 14px;
+  padding: 11px;
   min-height: unset;
   transition: transform 0.12s ease;
 }
@@ -105,14 +105,14 @@ export default {
 
 .pp-img-wrap {
   width: 118px;
-  border-radius: 18px;
+  border-radius: 10px;
   overflow: hidden;
   border: 1px solid rgba(17, 24, 39, 0.06);
-  background: #f3f4f6;
+  background: #24242b;
 }
 
 .pp-img {
-  border-radius: 18px;
+  border-radius: 10px;
 }
 
 .pp-img-ph {
@@ -124,8 +124,7 @@ export default {
   align-items: center;
   justify-content: center;
   gap: 6px;
-  background: linear-gradient(180deg, #f8fafc, #eef2f7);
-  color: #6b7280;
+  background: #24242b;
 }
 
 .pp-img-ph-text {
@@ -142,7 +141,6 @@ export default {
   font-size: 18px;
   font-weight: 850;
   line-height: 1.15;
-  color: #0b0f19;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -152,7 +150,6 @@ export default {
   margin-top: 5px;
   font-size: 14px;
   font-weight: 650;
-  color: #6b7280;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -165,18 +162,12 @@ export default {
   gap: 8px;
   padding: 8px 10px;
   border-radius: 12px;
-  border: 1px solid rgba(17, 24, 39, 0.10);
-  background: #f8fafc;
-}
-
-.pp-plate-icon {
-  color: #9ca3af;
+  background: #24242b;
 }
 
 .pp-plate-text {
   font-size: 13px;
   font-weight: 850;
-  color: #111827;
   letter-spacing: 1.1px;
 }
 
@@ -188,6 +179,5 @@ export default {
 
 .pp-right-icon {
   font-size: 24px;
-  color: #cbd5e1;
 }
 </style>

@@ -1,27 +1,37 @@
 <template>
-  <q-page class="q-pa-md">
-    <div v-show="this.vehicles.length" v-for="(data, key) in this.vehicles" :key="key">
-      <vehicle_card :_id="data._id" :make="data.make" :model="data.model" :plate="data.plate" :color="data.color"
-        :example_picture_id="data.example_picture_id" @selected_vehicle_id="get_selected_vehicle_id" />
+  <q-page class="pp-page">
+
+    <div v-if="!vehicles.length" class="pp-empty">
+      <q-icon name="directions_car" size="64px" color="positive" />
+      <div class="pp-empty-title">
+        You're in! Add your first car now.
+      </div>
     </div>
-    <add_vehicle_card 
-      v-show="!this.vehicles.length"/>
+
+    <div v-else class="pp-list">
+      <div v-for="(data, key) in vehicles" :key="data._id || key">
+        <vehicle_card :_id="data._id" :make="data.make" :model="data.model" :plate="data.plate" :color="data.color"
+          :example_picture_id="data.example_picture_id" @selected_vehicle_id="get_selected_vehicle_id" />
+      </div>
+    </div>
+
     <div class="pp-bottom-bar">
-      <q-btn class="pp-add-btn" unelevated no-caps icon="add" label="Add Vehicle" @click="go_add_vehicle_page" />
+      <q-btn class="pp-add-btn bg-white text-dark" unelevated no-caps icon="add" label="Add Vehicle"
+        @click="go_add_vehicle_page" />
     </div>
+
   </q-page>
+
 </template>
 
 <script>
 import { UseStore } from '../stores/store';
 
 import vehicle_card from '../components/vehicle_card.vue';
-import add_vehicle_card from '../components/add_vehicle_card.vue';
 
 export default {
   components: {
-    vehicle_card,
-    add_vehicle_card
+    vehicle_card
   },
   setup() {
     var store = UseStore();
@@ -39,7 +49,7 @@ export default {
   },
   methods: {
     go_add_vehicle_page() {
-      this.$router.push({name:'add-vehicle', params:{ user_id: this.store.user_data._id }});
+      this.$router.push({ name: 'add-vehicle', params: { user_id: this.store.user_data._id } });
     },
     get_selected_vehicle_id(_id) {
       var vehicle_id = _id;
@@ -61,7 +71,7 @@ export default {
 <style scoped>
 .pp-page {
   padding: 14px 14px 0 14px;
-  background: #f6f7fb;
+  background: #1C1C22;
 }
 
 .pp-list {
@@ -77,19 +87,37 @@ export default {
   right: 0;
   bottom: 0;
   padding: 12px 14px calc(12px + env(safe-area-inset-bottom)) 14px;
-  background: rgba(246, 247, 251, .86);
+  background: #1C1C22;
   backdrop-filter: blur(10px);
-  border-top: 1px solid rgba(17, 24, 39, .08);
   z-index: 50;
 }
 
 .pp-add-btn {
   width: 100%;
-  height: 54px;
+  height: 34px;
   border-radius: 18px;
   font-weight: 850;
   letter-spacing: .2px;
-  background: #111827;
-  color: #fff;
+}
+
+.pp-empty {
+  height: calc(100vh - 56px);
+  /* header varsa */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-align: center;
+}
+
+.pp-empty :deep(.q-icon) {
+  color: #2eff7b;
+}
+
+.pp-empty-title {
+  color: #cfcfd4;
+  font-size: 14px;
+  font-weight: 500;
 }
 </style>

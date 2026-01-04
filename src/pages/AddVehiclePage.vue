@@ -1,42 +1,95 @@
 <template>
     <q-page class="pp-page">
-        <div class="pp-topbar">
-            <q-btn flat round icon="arrow_back" class="pp-back" @click="go_back" />
+        <div class="pp-topbar text-white">
+            <q-btn flat round icon="chevron_left" class="pp-back" @click="go_back" />
             <div class="pp-title">Add Vehicle</div>
             <div class="pp-topbar-spacer"></div>
         </div>
 
-        <div class="pp-content">
-            <q-card flat bordered class="pp-card">
-                <div class="pp-card-head">
-                    <div class="pp-card-head-left">
-                        <div class="pp-card-title">Vehicle Photos</div>
+        <div class="pp-content text-white">
+            <!-- TOP: Plate + status -->
+            <q-card flat bordered class="pp-card pp-card-details">
+                <div class="pp-plate-head">
+                    <div class="pp-section-title">Plate</div>
+
+                    <div v-if="plate_state === 'found'" class="pp-plate-chip pp-plate-chip-found">
+                        Existing vehicle loaded
                     </div>
-                    <div class="pp-card-meta">Max 3 photos</div>
+                    <div v-else-if="plate_state === 'not_found'" class="pp-plate-chip pp-plate-chip-new">
+                        New vehicle
+                    </div>
+                    <div v-else-if="plate_state === 'checking'" class="pp-plate-chip pp-plate-chip-checking">
+                        Checking...
+                    </div>
                 </div>
 
-                <div class="pp-photos-row">
-                    <div v-for="i in [0, 1, 2]" :key="i" class="pp-photo-slot"
-                        :class="photos[i] ? 'pp-photo-filled' : 'pp-photo-add'" @click="pick_photo(i)" role="button"
-                        tabindex="0">
-                        <q-img v-if="photos[i]" :src="photos[i]" class="pp-photo-img" :ratio="1" fit="cover"
-                            no-spinner />
+                <div class="pp-field" style="margin-top:10px">
+                    <div class="pp-label">License Plate</div>
 
-                        <div v-else class="pp-photo-add-inner">
-                            <q-icon name="add_a_photo" size="24px" class="pp-photo-add-icon" />
-                            <div class="pp-photo-add-text">Add Photo</div>
-                        </div>
+                    <q-input v-model="form.plate" outlined dense class="pp-input" placeholder="34ABC123"
+                        :loading="plate_state === 'checking'" @update:model-value="on_plate_input"
+                        @blur="on_plate_blur">
+                        <template v-slot:prepend>
+                            <q-icon name="badge" class="pp-input-icon" />
+                        </template>
+                    </q-input>
 
-                        <q-btn v-if="photos[i]" round unelevated icon="close" class="pp-photo-remove"
-                            @click.stop="remove_photo(i)" />
+                    <div class="pp-help">
+                        Type plate. If it exists, we load it and you update. If not, you create.
                     </div>
                 </div>
             </q-card>
 
-            <q-card flat bordered class="pp-card pp-card-details">
-                <div class="pp-section-title">Vehicle Details</div>
+            <q-card flat bordered class="pp-card"
+                v-if="this.plate_state == 'found' && this.vehicle_existing_pictures.length">
+                <div class="pp-card-head">
+                    <div class="pp-card-head-left">
+                        <div class="pp-card-title">Vehicle Photos</div>
+                    </div>
+                </div>
 
-                <div class="pp-field">
+                <div class="pp-photos-row">
+                    <div v-for="i in vehicle_existing_pictures" :key="i._id" class="pp-photo-slot pp-photo-filled">
+                        <q-img :src="get_vehicle_picture(i._id)" class="pp-photo-img" :ratio="1" fit="cover"
+                            no-spinner />
+                        <q-btn round unelevated dense size="10px" icon="close" class="pp-photo-remove"
+                            @click.stop="delete_photo(i)" />
+                    </div>
+                </div>
+            </q-card>
+
+            <q-card flat bordered class="pp-card"">
+                <div class=" pp-card-head">
+                <div class="pp-card-head-left">
+                    <div class="pp-card-title">Vehicle Photos</div>
+                </div>
+                <div class="pp-card-meta">Max 3 photos</div>
+        </div>
+
+        <div class="pp-photos-row">
+            <div v-for="i in [0, 1, 2]" :key="i" class="pp-photo-slot"
+                :class="photos[i] ? 'pp-photo-filled' : 'pp-photo-add'" @click="pick_photo(i)" role="button"
+                tabindex="0">
+                <q-img v-if="photos[i]" :src="photos[i]" class="pp-photo-img" :ratio="1" fit="cover" no-spinner />
+
+                <div v-else class="pp-photo-add-inner">
+                    <div class="pp-photo-add-iconwrap">
+                        <q-icon name="photo_camera" size="30px" class="pp-photo-add-icon" />
+                        <div class="pp-photo-add-plus">+</div>
+                    </div>
+                    <div class="pp-photo-add-text">Add Photo</div>
+                </div>
+
+                <q-btn v-if="photos[i]" round unelevated dense size="10px" icon="close" class="pp-photo-remove"
+                    @click.stop="remove_photo(i)" />
+            </div>
+        </div>
+        </q-card>
+
+        <q-card flat bordered class="pp-card pp-card-details">
+            <div class="pp-section-title">Vehicle Details</div>
+
+            <!-- <div class="pp-field">
                     <div class="pp-label">License Plate</div>
                     <q-input v-model="form.plate" outlined dense class="pp-input" placeholder="">
                         <template v-slot:prepend>
@@ -44,70 +97,69 @@
                         </template>
                     </q-input>
                     <div class="pp-help">This will be linked to your QR code.</div>
+                </div> -->
+
+            <div class="pp-field">
+                <div class="pp-label">Vehicle Type</div>
+                <div class="pp-type-row">
+                    <button type="button" class="pp-type" :class="{ 'pp-type-active': form.vehicle_type === 'car' }"
+                        @click="form.vehicle_type = 'car'">
+                        <q-icon name="directions_car" size="26px" class="pp-type-icon" />
+                        <div class="pp-type-text">Car</div>
+                    </button>
+
+                    <button type="button" class="pp-type" :class="{ 'pp-type-active': form.vehicle_type === 'bike' }"
+                        @click="form.vehicle_type = 'bike'">
+                        <q-icon name="two_wheeler" size="26px" class="pp-type-icon" />
+                        <div class="pp-type-text">Bike</div>
+                    </button>
+
+                    <button type="button" class="pp-type" :class="{ 'pp-type-active': form.vehicle_type === 'truck' }"
+                        @click="form.vehicle_type = 'truck'">
+                        <q-icon name="local_shipping" size="26px" class="pp-type-icon" />
+                        <div class="pp-type-text">Truck</div>
+                    </button>
+                </div>
+            </div>
+
+            <div class="pp-grid-2">
+                <div class="pp-field">
+                    <div class="pp-label">Make</div>
+                    <q-input v-model="form.make" outlined dense class="pp-input" placeholder="Toyota" />
                 </div>
 
                 <div class="pp-field">
-                    <div class="pp-label">Vehicle Type</div>
-                    <div class="pp-type-row">
-                        <button type="button" class="pp-type" :class="{ 'pp-type-active': form.vehicle_type === 'car' }"
-                            @click="form.vehicle_type = 'car'">
-                            <q-icon name="directions_car" size="26px" class="pp-type-icon" />
-                            <div class="pp-type-text">Car</div>
-                        </button>
+                    <div class="pp-label">Model</div>
+                    <q-input v-model="form.model" outlined dense class="pp-input" placeholder="Camry" />
+                </div>
+            </div>
 
-                        <button type="button" class="pp-type"
-                            :class="{ 'pp-type-active': form.vehicle_type === 'bike' }"
-                            @click="form.vehicle_type = 'bike'">
-                            <q-icon name="two_wheeler" size="26px" class="pp-type-icon" />
-                            <div class="pp-type-text">Bike</div>
-                        </button>
+            <div class="pp-field">
+                <div class="pp-label">Color</div>
 
-                        <button type="button" class="pp-type"
-                            :class="{ 'pp-type-active': form.vehicle_type === 'truck' }"
-                            @click="form.vehicle_type = 'truck'">
-                            <q-icon name="local_shipping" size="26px" class="pp-type-icon" />
-                            <div class="pp-type-text">Truck</div>
-                        </button>
-                    </div>
+                <div class="pp-color-row">
+                    <button v-for="c in color_options" :key="c.key" type="button" class="pp-color-chip text-white"
+                        :class="{ 'pp-color-active': form.color_key === c.key }" @click="select_color(c)">
+                        <span class="pp-color-dot" :style="{ background: c.dot }"></span>
+                        <span class="pp-color-text">{{ c.label }}</span>
+                    </button>
+
+                    <button type="button" class="pp-color-chip text-white"
+                        :class="{ 'pp-color-active': form.color_key === 'other' }" @click="select_other_color">
+                        <span class="pp-color-dot" style="background:#e5e7eb"></span>
+                        <span class="pp-color-text">Other</span>
+                    </button>
                 </div>
 
-                <div class="pp-grid-2">
-                    <div class="pp-field">
-                        <div class="pp-label">make</div>
-                        <q-input v-model="form.make" outlined dense class="pp-input" placeholder="Toyota" />
-                    </div>
-
-                    <div class="pp-field">
-                        <div class="pp-label">Model</div>
-                        <q-input v-model="form.model" outlined dense class="pp-input" placeholder="Camry" />
-                    </div>
-                </div>
-
-                <div class="pp-field">
-                    <div class="pp-label">Color</div>
-
-                    <div class="pp-color-row">
-                        <button v-for="c in color_options" :key="c.key" type="button" class="pp-color-chip"
-                            :class="{ 'pp-color-active': form.color_key === c.key }" @click="select_color(c)">
-                            <span class="pp-color-dot" :style="{ background: c.dot }"></span>
-                            <span class="pp-color-text">{{ c.label }}</span>
-                        </button>
-
-                        <button type="button" class="pp-color-chip pp-color-other"
-                            :class="{ 'pp-color-active': form.color_key === 'other' }" @click="select_other_color">
-                            <span class="pp-color-dot" style="background:#e5e7eb"></span>
-                            <span class="pp-color-text">Other</span>
-                        </button>
-                    </div>
-
-                    <q-input v-if="form.color_key === 'other'" v-model="form.color_custom" outlined dense
-                        class="pp-input pp-color-custom" placeholder="e.g. Pearl White" />
-                </div>
-            </q-card>
+                <q-input v-if="form.color_key === 'other'" v-model="form.color_custom" outlined dense
+                    class="pp-input pp-color-custom" placeholder="e.g. Pearl White" />
+            </div>
+        </q-card>
         </div>
         <input ref="fileInput" type="file" accept="image/*" style="display:none" @change="on_file_change" />
         <div class="pp-bottom-bar">
-            <q-btn icon="done" class="pp-save-btn" unelevated no-caps label="Save Vehicle" @click="save_vehicle" />
+            <q-btn class="pp-save-btn bg-white text-dark" unelevated no-caps icon="check" label="Save Vehicle"
+                @click="save_vehicle" />
         </div>
     </q-page>
 </template>
@@ -136,18 +188,25 @@ export default {
                 color_label: 'Silver',
                 color_custom: ''
             },
-            photo_files: [null, null, null],
+            vehicle_pictures: [null, null, null],
             selected_slot: null,
             color_options: [
-                { key: 'black', label: 'Black', dot: '#111827' },
-                { key: 'white', label: 'White', dot: '#f8fafc' },
-                { key: 'silver', label: 'Silver', dot: '#cbd5e1' },
-                { key: 'gray', label: 'Gray', dot: '#94a3b8' },
-                { key: 'blue', label: 'Blue', dot: '#2563eb' },
-                { key: 'red', label: 'Red', dot: '#dc2626' },
-                { key: 'green', label: 'Green', dot: '#16a34a' },
-                { key: 'yellow', label: 'Yellow', dot: '#facc15' }
+                { key: 'black', label: 'black', dot: '#111827' },
+                { key: 'white', label: 'white', dot: '#f8fafc' },
+                { key: 'silver', label: 'silver', dot: '#cbd5e1' },
+                { key: 'gray', label: 'gray', dot: '#94a3b8' },
+                { key: 'blue', label: 'blue', dot: '#2563eb' },
+                { key: 'red', label: 'red', dot: '#dc2626' },
+                { key: 'green', label: 'green', dot: '#16a34a' },
+                { key: 'yellow', label: 'yellow', dot: '#facc15' }
             ],
+            plate_state: 'idle', // idle | checking | found | not_found
+            editing_vehicle_id: null,
+
+            plate_debounce_ms: 650,
+            plate_timer: null,
+            last_checked_plate: '',
+            vehicle_existing_pictures: []
         };
     },
     async mounted() {
@@ -155,6 +214,116 @@ export default {
         if (user_id) this.current_user_id = user_id;
     },
     methods: {
+        async delete_photo(i) {
+            var file_id = i._id;
+            var res = await this.$api.post('/delete-picture', { file_id: file_id });
+            if( res.status !== 204 ) return;
+
+            this.vehicle_existing_pictures = this.vehicle_existing_pictures.filter(function(item){ return item._id !== i._id});
+        },
+        on_plate_input(val) {
+            var p = val;
+            if (!p || p.length < 4) {
+
+                this.plate_state = 'idle';
+                this.editing_vehicle_id = null;
+                this.last_checked_plate = '';
+                if (this.plate_timer) clearTimeout(this.plate_timer);
+                return;
+            }
+
+            if (this.plate_timer) clearTimeout(this.plate_timer);
+
+            this.plate_timer = setTimeout(() => {
+                this.check_plate_and_load(p, { force: false });
+            }, this.plate_debounce_ms);
+        },
+        on_plate_blur() {
+            var p = this.form.plate;
+
+            if (!p || p.length < 4) return;
+
+            this.check_plate_and_load(p, { force: true });
+        },
+        async check_plate_and_load(plate, opts) {
+            opts = opts || {};
+            var force = !!opts.force;
+
+            if (!force && plate === this.last_checked_plate) return;
+
+            this.plate_state = 'checking';
+
+            try {
+                var res = await this.$api.post('/plate-control', { plate: plate });
+
+                if (res.status !== 200) {
+                    this.plate_state = 'idle';
+                    return;
+                }
+
+                this.last_checked_plate = plate;
+
+                if (res.status === 200) {
+                    this.apply_vehicle_to_form(res.data.vehicle_detail);
+                    this.plate_state = 'found';
+                }
+                else {
+                    this.reset_form_keep_plate(plate);
+                    this.plate_state = 'not_found';
+                }
+            } catch (e) {
+                this.plate_state = 'idle';
+            }
+        },
+        apply_vehicle_to_form(v) {
+            console.log("founded_vehicle -> " + JSON.stringify(v));
+            this.editing_vehicle_id = v._id || null;
+
+            this.form.make = v.make || '';
+            this.form.model = v.model || '';
+            this.form.vehicle_type = v.vehicle_type || 'car';
+            this.form.color = v.color || null;
+
+            this.vehicle_existing_pictures = v.vehicle_pictures;
+
+            var existing_color = this.color_options.find(function (item) { return item.label === v.color })
+            if (existing_color) {
+
+                this.form.color_key = v.color;
+                this.form.color_label = v.color;
+                this.form.color_custom = null;
+            } else {
+
+                this.form.color_custom = v.color;
+            }
+        },
+        reset_form_keep_plate(plate) {
+            this.editing_vehicle_id = null;
+
+            this.form.make = '';
+            this.form.model = '';
+            this.form.vehicle_type = 'car';
+
+            this.form.color_key = 'silver';
+            this.form.color_label = 'Silver';
+            this.form.color_custom = '';
+
+            for (var i = 0; i < this.photos.length; i++) {
+                if (this.photos[i] && typeof this.photos[i] === 'string' && this.photos[i].startsWith('blob:')) {
+                    URL.revokeObjectURL(this.photos[i]);
+                }
+                this.photos[i] = null;
+                this.vehicle_pictures[i] = null;
+            }
+
+            this.form.plate = plate;
+        },
+        find_color_key_by_label(label) {
+            if (!label) return null;
+            var l = String(label).trim().toLocaleLowerCase('tr-TR');
+            var row = (this.color_options || []).find(x => String(x.label).toLocaleLowerCase('tr-TR') === l);
+            return row ? row.key : null;
+        },
         select_color(c) {
             this.form.color_key = c.key;
             this.form.color_label = c.label;
@@ -205,7 +374,7 @@ export default {
                 URL.revokeObjectURL(this.photos[slot]);
             }
 
-            this.photo_files[slot] = file;
+            this.vehicle_pictures[slot] = file;
             this.photos[slot] = URL.createObjectURL(file);
             this.selected_slot = null;
         },
@@ -215,7 +384,7 @@ export default {
                 URL.revokeObjectURL(this.photos[idx]);
             }
             this.photos[idx] = null;
-            this.photo_files[idx] = null;
+            this.vehicle_pictures[idx] = null;
         },
         async save_vehicle() {
             var fd = new FormData();
@@ -224,8 +393,8 @@ export default {
             fd.append('make', this.form.make);
             fd.append('model', this.form.model);
 
-            for (var i = 0; i < this.photo_files.length; i++) {
-                if (this.photo_files[i]) fd.append('vehicle_pictures', this.photo_files[i]);
+            for (var i = 0; i < this.vehicle_pictures.length; i++) {
+                if (this.vehicle_pictures[i]) fd.append('vehicle_pictures', this.vehicle_pictures[i]);
             };
 
             var final_color = this.form.color_key === 'other'
@@ -234,20 +403,25 @@ export default {
 
             fd.append('color', final_color);
             this.form.color = final_color;
-            
+
             var res = await this.$api.post('/add-vehicle', fd);
             console.log("add_vehicle_service -> " + JSON.stringify(res));
-            if( res.status !== 200 ) return;
+            if (res.status !== 200) return;
 
-            this.$router.push({ name:'home' });
-        }
+            this.$router.push({ name: 'home' });
+        },
+        get_vehicle_picture(_id) {
+            var backend_url = import.meta.env.VITE_BACKEND_URL;
+            console.log(backend_url + '/picture/' + _id);
+            return backend_url + '/picture/' + _id;
+        },
     }
 };
 </script>
 
 <style scoped>
 .pp-page {
-    background: #f6f7fb;
+    background: #1c1c22;
     padding-bottom: calc(86px + env(safe-area-inset-bottom));
 }
 
@@ -266,9 +440,8 @@ export default {
 }
 
 .pp-title {
-    font-size: 16px;
-    font-weight: 900;
-    color: #0b0f19;
+    font-size: 20px;
+    font-weight: 700;
 }
 
 .pp-topbar-spacer {
@@ -285,7 +458,7 @@ export default {
 
 .pp-card {
     border-radius: 18px;
-    background: #fff;
+    background: #24242b;
     border: 1px solid rgba(17, 24, 39, .06);
     overflow: hidden;
     padding: 14px;
@@ -300,28 +473,35 @@ export default {
 .pp-card-title {
     font-size: 15px;
     font-weight: 900;
-    color: #0b0f19;
 }
 
 .pp-card-meta {
     font-size: 12px;
     font-weight: 800;
-    color: #94a3b8;
 }
 
 .pp-photos-row {
     margin-top: 12px;
     display: flex;
     gap: 12px;
+
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+    padding-bottom: 4px;
 }
 
 .pp-photo-slot {
+    flex: 0 0 96px;
+    scroll-snap-align: start;
     width: 96px;
     height: 96px;
     border-radius: 16px;
     overflow: hidden;
     position: relative;
-    flex: 0 0 96px;
 }
 
 .pp-photo-filled {
@@ -336,19 +516,28 @@ export default {
 
 .pp-photo-remove {
     position: absolute;
-    top: 8px;
-    right: 8px;
-    width: 28px;
-    height: 28px;
+    top: 6px;
+    right: 6px;
+    width: 22px;
+    height: 22px;
+    min-width: 22px;
+    min-height: 22px;
+    padding: 0;
     border-radius: 999px;
-    background: rgba(17, 24, 39, .85);
-    color: #fff;
+    background: rgba(17, 24, 39, .78);
+}
+
+.pp-photo-remove :deep(.q-icon) {
+    font-size: 14px;
+}
+
+.pp-photo-remove:active {
+    transform: scale(.96);
 }
 
 .pp-photo-add {
-    border: 2px dashed rgba(148, 163, 184, .7);
-    background: #fbfcff;
-    padding: 0;
+    border: 2px dashed rgba(255, 255, 255, .22);
+    background: #1f1f26;
     cursor: pointer;
 }
 
@@ -359,17 +548,52 @@ export default {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 6px;
+    gap: 8px;
+    color: rgba(255, 255, 255, .55);
+}
+
+.pp-photo-add-iconwrap {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    display: grid;
+    place-items: center;
+    border-radius: 12px;
 }
 
 .pp-photo-add-icon {
-    color: #94a3b8;
+    color: rgba(255, 255, 255, .45);
+}
+
+.pp-photo-add-plus {
+    position: absolute;
+    right: -3px;
+    top: -3px;
+    width: 16px;
+    height: 16px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .10);
+    border: 1px solid rgba(255, 255, 255, .18);
+    display: grid;
+    place-items: center;
+    font-size: 12px;
+    font-weight: 900;
+    line-height: 1;
+    color: rgba(255, 255, 255, .65);
+}
+
+.pp-photo-add:active {
+    transform: scale(.98);
+}
+
+.pp-photo-add:hover {
+    border-color: rgba(255, 255, 255, .32);
 }
 
 .pp-photo-add-text {
     font-size: 12px;
     font-weight: 800;
-    color: #94a3b8;
+    color: rgba(255, 255, 255, .55);
 }
 
 .pp-manage {
@@ -385,12 +609,9 @@ export default {
     cursor: pointer;
 }
 
-.pp-manage-icon {
-    color: #2563eb;
-}
+.pp-manage-icon {}
 
 .pp-manage-text {
-    color: #2563eb;
     font-size: 13px;
     font-weight: 900;
 }
@@ -398,7 +619,6 @@ export default {
 .pp-section-title {
     font-size: 15px;
     font-weight: 900;
-    color: #0b0f19;
     margin-bottom: 8px;
 }
 
@@ -409,7 +629,6 @@ export default {
 .pp-label {
     font-size: 12px;
     font-weight: 900;
-    color: #475569;
     margin-bottom: 8px;
 }
 
@@ -417,29 +636,29 @@ export default {
     margin-top: 6px;
     font-size: 12px;
     font-weight: 700;
-    color: #94a3b8;
 }
 
 .pp-input :deep(.q-field__control) {
     border-radius: 14px;
-    background: #fff;
+    background: #1e1e1e;
+    color: white;
 }
 
 .pp-input :deep(.q-field__control:before) {
-    border-color: rgba(148, 163, 184, .5);
+    border-color: #24242b;
 }
 
 .pp-input :deep(.q-field__control:hover:before) {
-    border-color: rgba(148, 163, 184, .7);
+    border-color: #24242b;
 }
 
 .pp-input :deep(.q-field__native) {
     font-weight: 800;
-    color: #0b0f19;
+    color: white;
 }
 
 .pp-input-icon {
-    color: #94a3b8;
+    color: white;
 }
 
 .pp-type-row {
@@ -451,37 +670,36 @@ export default {
     flex: 1;
     height: 72px;
     border-radius: 14px;
-    border: 1.5px solid rgba(148, 163, 184, .5);
-    background: #fff;
+    border: 1px solid rgb(134, 134, 134);
+    background: #24242b;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 6px;
-    cursor: pointer;
 }
 
 .pp-type-active {
-    border-color: rgba(37, 99, 235, .85);
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, .14);
+    border-color: #2eff7b;
 }
 
 .pp-type-icon {
-    color: #0b0f19;
+    color: #5e5e5e;
 }
 
 .pp-type-active .pp-type-icon {
-    color: #2563eb;
+    color: #2eff7b;
+    border-color: #2eff7b;
 }
 
 .pp-type-text {
     font-size: 12px;
     font-weight: 900;
-    color: #0b0f19;
+    color: #5e5e5e;
 }
 
 .pp-type-active .pp-type-text {
-    color: #2563eb;
+    color: #2eff7b;
 }
 
 .pp-grid-2 {
@@ -503,7 +721,6 @@ export default {
     width: 36px;
     height: 36px;
     border-radius: 12px;
-    color: #94a3b8;
 }
 
 .pp-bottom-bar {
@@ -512,19 +729,16 @@ export default {
     right: 0;
     bottom: 0;
     padding: 12px 14px calc(12px + env(safe-area-inset-bottom)) 14px;
-    background: rgba(246, 247, 251, .86);
+    background: #1C1C22;
     backdrop-filter: blur(10px);
-    border-top: 1px solid rgba(17, 24, 39, .08);
     z-index: 50;
 }
 
 .pp-save-btn {
     width: 100%;
-    height: 54px;
-    border-radius: 16px;
-    background: black;
-    color: #fff;
-    font-weight: 900;
+    height: 34px;
+    border-radius: 18px;
+    font-weight: 850;
     letter-spacing: .2px;
 }
 
@@ -541,16 +755,14 @@ export default {
     height: 40px;
     padding: 0 12px;
     border-radius: 14px;
-    border: 1.5px solid rgba(148, 163, 184, .5);
-    background: #fff;
+    border: 1px solid #24242b;
+    background: #1e1e1e;
     cursor: pointer;
     font-weight: 900;
-    color: #0b0f19;
 }
 
 .pp-color-active {
-    border-color: rgba(37, 99, 235, .85);
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, .14);
+    border-color: #2eff7b;
 }
 
 .pp-color-dot {
