@@ -58,7 +58,7 @@
                 </div>
             </q-card>
 
-            <q-card flat bordered class="pp-card"">
+            <q-card flat bordered class="pp-card">
                 <div class=" pp-card-head">
                 <div class="pp-card-head-left">
                     <div class="pp-card-title">Vehicle Photos</div>
@@ -276,7 +276,6 @@ export default {
             }
         },
         apply_vehicle_to_form(v) {
-            console.log("founded_vehicle -> " + JSON.stringify(v));
             this.editing_vehicle_id = v._id || null;
 
             this.form.make = v.make || '';
@@ -329,7 +328,6 @@ export default {
             this.form.color_label = c.label;
             this.form.color_custom = '';
         },
-
         select_other_color() {
             this.form.color_key = 'other';
             this.form.color_label = '';
