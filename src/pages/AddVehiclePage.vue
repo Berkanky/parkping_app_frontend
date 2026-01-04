@@ -41,7 +41,7 @@
             </q-card>
 
             <q-card flat bordered class="pp-card"
-                v-if="this.plate_state == 'found' && this.vehicle_existing_pictures.length">
+                v-if="plate_state === 'found' && (vehicle_existing_pictures || []).length">
                 <div class="pp-card-head">
                     <div class="pp-card-head-left">
                         <div class="pp-card-title">Vehicle Photos</div>
@@ -60,36 +60,37 @@
 
             <q-card flat bordered class="pp-card">
                 <div class=" pp-card-head">
-                <div class="pp-card-head-left">
-                    <div class="pp-card-title">Vehicle Photos</div>
-                </div>
-                <div class="pp-card-meta">Max 3 photos</div>
-        </div>
-
-        <div class="pp-photos-row">
-            <div v-for="i in [0, 1, 2]" :key="i" class="pp-photo-slot"
-                :class="photos[i] ? 'pp-photo-filled' : 'pp-photo-add'" @click="pick_photo(i)" role="button"
-                tabindex="0">
-                <q-img v-if="photos[i]" :src="photos[i]" class="pp-photo-img" :ratio="1" fit="cover" no-spinner />
-
-                <div v-else class="pp-photo-add-inner">
-                    <div class="pp-photo-add-iconwrap">
-                        <q-icon name="photo_camera" size="30px" class="pp-photo-add-icon" />
-                        <div class="pp-photo-add-plus">+</div>
+                    <div class="pp-card-head-left">
+                        <div class="pp-card-title">Vehicle Photos</div>
                     </div>
-                    <div class="pp-photo-add-text">Add Photo</div>
+                    <div class="pp-card-meta">Max 3 photos</div>
                 </div>
 
-                <q-btn v-if="photos[i]" round unelevated dense size="10px" icon="close" class="pp-photo-remove"
-                    @click.stop="remove_photo(i)" />
-            </div>
-        </div>
-        </q-card>
+                <div class="pp-photos-row">
+                    <div v-for="i in [0, 1, 2]" :key="i" class="pp-photo-slot"
+                        :class="photos[i] ? 'pp-photo-filled' : 'pp-photo-add'" @click="pick_photo(i)" role="button"
+                        tabindex="0">
+                        <q-img v-if="photos[i]" :src="photos[i]" class="pp-photo-img" :ratio="1" fit="cover"
+                            no-spinner />
 
-        <q-card flat bordered class="pp-card pp-card-details">
-            <div class="pp-section-title">Vehicle Details</div>
+                        <div v-else class="pp-photo-add-inner">
+                            <div class="pp-photo-add-iconwrap">
+                                <q-icon name="photo_camera" size="30px" class="pp-photo-add-icon" />
+                                <div class="pp-photo-add-plus">+</div>
+                            </div>
+                            <div class="pp-photo-add-text">Add Photo</div>
+                        </div>
 
-            <!-- <div class="pp-field">
+                        <q-btn v-if="photos[i]" round unelevated dense size="10px" icon="close" class="pp-photo-remove"
+                            @click.stop="remove_photo(i)" />
+                    </div>
+                </div>
+            </q-card>
+
+            <q-card flat bordered class="pp-card pp-card-details">
+                <div class="pp-section-title">Vehicle Details</div>
+
+                <!-- <div class="pp-field">
                     <div class="pp-label">License Plate</div>
                     <q-input v-model="form.plate" outlined dense class="pp-input" placeholder="">
                         <template v-slot:prepend>
@@ -99,62 +100,64 @@
                     <div class="pp-help">This will be linked to your QR code.</div>
                 </div> -->
 
-            <div class="pp-field">
-                <div class="pp-label">Vehicle Type</div>
-                <div class="pp-type-row">
-                    <button type="button" class="pp-type" :class="{ 'pp-type-active': form.vehicle_type === 'car' }"
-                        @click="form.vehicle_type = 'car'">
-                        <q-icon name="directions_car" size="26px" class="pp-type-icon" />
-                        <div class="pp-type-text">Car</div>
-                    </button>
-
-                    <button type="button" class="pp-type" :class="{ 'pp-type-active': form.vehicle_type === 'bike' }"
-                        @click="form.vehicle_type = 'bike'">
-                        <q-icon name="two_wheeler" size="26px" class="pp-type-icon" />
-                        <div class="pp-type-text">Bike</div>
-                    </button>
-
-                    <button type="button" class="pp-type" :class="{ 'pp-type-active': form.vehicle_type === 'truck' }"
-                        @click="form.vehicle_type = 'truck'">
-                        <q-icon name="local_shipping" size="26px" class="pp-type-icon" />
-                        <div class="pp-type-text">Truck</div>
-                    </button>
-                </div>
-            </div>
-
-            <div class="pp-grid-2">
                 <div class="pp-field">
-                    <div class="pp-label">Make</div>
-                    <q-input v-model="form.make" outlined dense class="pp-input" placeholder="Toyota" />
+                    <div class="pp-label">Vehicle Type</div>
+                    <div class="pp-type-row">
+                        <button type="button" class="pp-type" :class="{ 'pp-type-active': form.vehicle_type === 'car' }"
+                            @click="form.vehicle_type = 'car'">
+                            <q-icon name="directions_car" size="26px" class="pp-type-icon" />
+                            <div class="pp-type-text">Car</div>
+                        </button>
+
+                        <button type="button" class="pp-type"
+                            :class="{ 'pp-type-active': form.vehicle_type === 'bike' }"
+                            @click="form.vehicle_type = 'bike'">
+                            <q-icon name="two_wheeler" size="26px" class="pp-type-icon" />
+                            <div class="pp-type-text">Bike</div>
+                        </button>
+
+                        <button type="button" class="pp-type"
+                            :class="{ 'pp-type-active': form.vehicle_type === 'truck' }"
+                            @click="form.vehicle_type = 'truck'">
+                            <q-icon name="local_shipping" size="26px" class="pp-type-icon" />
+                            <div class="pp-type-text">Truck</div>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="pp-grid-2">
+                    <div class="pp-field">
+                        <div class="pp-label">Make</div>
+                        <q-input v-model="form.make" outlined dense class="pp-input" placeholder="Toyota" />
+                    </div>
+
+                    <div class="pp-field">
+                        <div class="pp-label">Model</div>
+                        <q-input v-model="form.model" outlined dense class="pp-input" placeholder="Camry" />
+                    </div>
                 </div>
 
                 <div class="pp-field">
-                    <div class="pp-label">Model</div>
-                    <q-input v-model="form.model" outlined dense class="pp-input" placeholder="Camry" />
+                    <div class="pp-label">Color</div>
+
+                    <div class="pp-color-row">
+                        <button v-for="c in color_options" :key="c.key" type="button" class="pp-color-chip text-white"
+                            :class="{ 'pp-color-active': form.color_key === c.key }" @click="select_color(c)">
+                            <span class="pp-color-dot" :style="{ background: c.dot }"></span>
+                            <span class="pp-color-text">{{ c.label }}</span>
+                        </button>
+
+                        <button type="button" class="pp-color-chip text-white"
+                            :class="{ 'pp-color-active': form.color_key === 'other' }" @click="select_other_color">
+                            <span class="pp-color-dot" style="background:#e5e7eb"></span>
+                            <span class="pp-color-text">Other</span>
+                        </button>
+                    </div>
+
+                    <q-input v-if="form.color_key === 'other'" v-model="form.color_custom" outlined dense
+                        class="pp-input pp-color-custom" placeholder="e.g. Pearl White" />
                 </div>
-            </div>
-
-            <div class="pp-field">
-                <div class="pp-label">Color</div>
-
-                <div class="pp-color-row">
-                    <button v-for="c in color_options" :key="c.key" type="button" class="pp-color-chip text-white"
-                        :class="{ 'pp-color-active': form.color_key === c.key }" @click="select_color(c)">
-                        <span class="pp-color-dot" :style="{ background: c.dot }"></span>
-                        <span class="pp-color-text">{{ c.label }}</span>
-                    </button>
-
-                    <button type="button" class="pp-color-chip text-white"
-                        :class="{ 'pp-color-active': form.color_key === 'other' }" @click="select_other_color">
-                        <span class="pp-color-dot" style="background:#e5e7eb"></span>
-                        <span class="pp-color-text">Other</span>
-                    </button>
-                </div>
-
-                <q-input v-if="form.color_key === 'other'" v-model="form.color_custom" outlined dense
-                    class="pp-input pp-color-custom" placeholder="e.g. Pearl White" />
-            </div>
-        </q-card>
+            </q-card>
         </div>
         <input ref="fileInput" type="file" accept="image/*" style="display:none" @change="on_file_change" />
         <div class="pp-bottom-bar">
@@ -217,9 +220,9 @@ export default {
         async delete_photo(i) {
             var file_id = i._id;
             var res = await this.$api.post('/delete-picture', { file_id: file_id });
-            if( res.status !== 204 ) return;
+            if (res.status !== 204) return;
 
-            this.vehicle_existing_pictures = this.vehicle_existing_pictures.filter(function(item){ return item._id !== i._id});
+            this.vehicle_existing_pictures = this.vehicle_existing_pictures.filter(function (item) { return item._id !== i._id });
         },
         on_plate_input(val) {
             var p = val;
@@ -283,7 +286,7 @@ export default {
             this.form.vehicle_type = v.vehicle_type || 'car';
             this.form.color = v.color || null;
 
-            this.vehicle_existing_pictures = v.vehicle_pictures;
+            this.vehicle_existing_pictures = Array.isArray(v.vehicle_pictures) ? v.vehicle_pictures : [];
 
             var existing_color = this.color_options.find(function (item) { return item.label === v.color })
             if (existing_color) {
@@ -306,6 +309,8 @@ export default {
             this.form.color_key = 'silver';
             this.form.color_label = 'Silver';
             this.form.color_custom = '';
+
+            this.vehicle_existing_pictures = [];
 
             for (var i = 0; i < this.photos.length; i++) {
                 if (this.photos[i] && typeof this.photos[i] === 'string' && this.photos[i].startsWith('blob:')) {
@@ -376,7 +381,6 @@ export default {
             this.photos[slot] = URL.createObjectURL(file);
             this.selected_slot = null;
         },
-
         remove_photo(idx) {
             if (this.photos[idx] && typeof this.photos[idx] === 'string' && this.photos[idx].startsWith('blob:')) {
                 URL.revokeObjectURL(this.photos[idx]);
