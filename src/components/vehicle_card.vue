@@ -3,26 +3,19 @@
     <q-item clickable v-ripple class="pp-item" @click="go_detail(_id)">
       <q-item-section avatar class="pp-avatar">
         <div class="pp-img-wrap">
-          <q-img
-            class="pp-img"
-            :src="example_picture_id ? get_vehicle_example_picture() : undefined"
-            :ratio="4 / 3"
-            fit="cover"
-            no-spinner
-          >
+          <q-img class="pp-img" :src="example_picture_id ? get_vehicle_example_picture() : undefined" :ratio="4 / 3"
+            fit="cover" no-spinner>
             <template v-slot:loading>
               <div class="pp-img-ph">
                 <q-spinner size="24px" />
               </div>
             </template>
-
             <template v-slot:error>
               <div class="pp-img-ph">
                 <q-icon name="directions_car" size="28px" />
                 <div class="pp-img-ph-text">No Picture</div>
               </div>
             </template>
-
             <template v-slot:default>
               <div v-if="!example_picture_id" class="pp-img-ph">
                 <q-icon name="add_a_photo" size="28px" />
@@ -32,17 +25,14 @@
           </q-img>
         </div>
       </q-item-section>
-
       <q-item-section class="pp-content">
         <div class="pp-title text-white">{{ make }}</div>
         <div class="pp-subtitle text-grey-6">{{ model }} - {{ color }}</div>
-
         <div class="pp-plate text-white">
           <q-icon name="badge" size="16px" class="pp-plate-icon" />
           <div class="pp-plate-text">{{ plate }}</div>
         </div>
       </q-item-section>
-
       <q-item-section side class="pp-side" aria-hidden="true">
         <q-icon name="chevron_right" class="pp-right-icon text-white" />
       </q-item-section>

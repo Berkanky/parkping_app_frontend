@@ -2,28 +2,23 @@
   <q-layout view="hHh lpR fFf">
     <q-header class="app_header" v-if="this.checkRouteMeta() && this.is_sidebar_button_active()">
       <q-toolbar class="q-px-md" style="height:56px;">
-        <q-btn
-          dense flat round icon="menu" @click="leftDrawerToggle()" />
-
+        <q-btn dense flat round icon="menu" @click="leftDrawerToggle()" />
         <q-toolbar-title class="text-center">
           {{ this.dynamic_header_title() }}
         </q-toolbar-title>
-
-        <q-btn 
-          v-if="this.$route.name == 'home'"
-          class="profile_icon" dense flat round icon="person" size="" v-on:click="go_profile_page()"/>
+        <q-btn v-if="this.$route.name == 'home'" class="profile_icon" dense flat round icon="person" size=""
+          v-on:click="go_profile_page()" />
       </q-toolbar>
     </q-header>
-
-
-    <q-drawer v-model="left_drawer_open" side="left" overlay behavior="mobile" :width="320" class="pp-drawer">
+    <q-drawer v-model="left_drawer_open" side="left" overlay behavior="mobile" :width="320" class="text-white"
+      style="background:  #1c1c22 ;">
       <div class="pp-wrap">
 
         <div class="pp-top">
           <div class="pp-brand">
             <div class="pp-logo">
               <q-avatar size="sm">
-                <img src="../images/parkping_app_logo.svg" />
+                <img src="../images/parkping_app_logo_black.svg" />
               </q-avatar>
             </div>
             <div class="pp-brand-text">ParkPing</div>
@@ -47,7 +42,7 @@
           <q-item clickable v-ripple :active="isActive('/home')" active-class="pp-active" class="pp-item"
             @click="go('/home')">
             <q-item-section avatar class="pp-icon">
-              <q-icon name="home" />
+              <q-icon name="directions_car" />
             </q-item-section>
             <q-item-section class="pp-text">
               My Cars
@@ -61,16 +56,6 @@
             </q-item-section>
             <q-item-section class="pp-text">
               Profile
-            </q-item-section>
-          </q-item>
-
-          <q-item clickable v-ripple :active="isActive(`/add-vehicle/${this.store.user_data._id}`)"
-            active-class="pp-active" class="pp-item" @click="go(`/add-vehicle/${this.store.user_data._id}`)">
-            <q-item-section avatar class="pp-icon">
-              <q-icon name="add_circle" />
-            </q-item-section>
-            <q-item-section class="pp-text">
-              Add Car
             </q-item-section>
           </q-item>
 
@@ -99,8 +84,6 @@
 
         <div class="pp-bottom">
           <q-btn outline no-caps class="pp-logout" icon="logout" label="Logout" @click="this.logout_service()" />
-
-          <div class="pp-version">VERSION 2.4.0</div>
         </div>
 
       </div>
@@ -139,12 +122,13 @@ export default {
     }
   },
   methods: {
-    is_sidebar_button_active(){
-      if( this.$route.name == 'home' ) return true;
-      else return false;
+    is_sidebar_button_active() {
+      var active_path_name_list = ['home'];
+      var route_name = this.$route.name;
+      return active_path_name_list.some(function (item) { return item == route_name });
     },
-    go_profile_page(){
-      this.$router.push({name:'profile', params:{ user_id: this.store.user_data._id }})
+    go_profile_page() {
+      this.$router.push({ name: 'profile', params: { user_id: this.store.user_data._id } })
     },
     dynamic_header_title() {
       var current_route_name = this.$route.name;
@@ -167,7 +151,6 @@ export default {
     async logout_service() {
 
       var res = await this.$api.post('/logout');
-      console.log("logout_service -> " + JSON.stringify(res));
       if (res.status !== 200) return;
 
       this.store.user_data = {};
@@ -180,16 +163,13 @@ export default {
 </script>
 
 <style scoped>
-.profile_icon{
+.profile_icon {
   background: #2eff7b;
   color: black;
 }
-.app_header {
-  background: #1C1C22;
-}
 
-.pp-drawer {
-  background: #f3f4f6;
+.app_header {
+  background: #1c1c22;
 }
 
 .pp-wrap {
@@ -216,7 +196,6 @@ export default {
   width: 34px;
   height: 34px;
   border-radius: 10px;
-  background: #000;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -225,12 +204,7 @@ export default {
 .pp-brand-text {
   font-size: 20px;
   font-weight: 700;
-  color: #111;
   letter-spacing: 0.2px;
-}
-
-.pp-close {
-  color: #111;
 }
 
 .pp-profile {
@@ -245,18 +219,15 @@ export default {
   margin-top: 14px;
   font-size: 18px;
   font-weight: 800;
-  color: #111;
 }
 
 .pp-email {
   margin-top: 6px;
   font-size: 13px;
-  color: #6b7280;
 }
 
 .pp-divider {
   height: 1px;
-  background: #e5e7eb;
   margin: 18px 0 10px 0;
 }
 
@@ -268,22 +239,19 @@ export default {
   border-radius: 14px;
   padding: 14px 14px;
   margin: 6px 0;
-  color: #111;
 }
 
 .pp-icon :deep(.q-icon) {
   font-size: 22px;
-  color: #111;
 }
 
 .pp-text {
   font-size: 15px;
   font-weight: 600;
-  color: #111;
 }
 
 .pp-active {
-  background: #000 !important;
+  background: #252424 !important;
 }
 
 .pp-active .pp-text {
@@ -304,10 +272,8 @@ export default {
 
 .pp-logout {
   width: 100%;
-  border-radius: 12px;
-  padding: 12px 14px;
+  border-radius: 7px;
   font-weight: 700;
-  color: #111;
 }
 
 .pp-version {
@@ -315,6 +281,5 @@ export default {
   text-align: center;
   font-size: 11px;
   letter-spacing: 1.6px;
-  color: #9ca3af;
 }
 </style>

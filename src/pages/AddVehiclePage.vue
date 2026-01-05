@@ -7,7 +7,6 @@
         </div>
 
         <div class="pp-content text-white">
-            <!-- TOP: Plate + status -->
             <q-card flat bordered class="pp-card pp-card-details">
                 <div class="pp-plate-head">
                     <div class="pp-section-title">Plate</div>
@@ -89,17 +88,6 @@
 
             <q-card flat bordered class="pp-card pp-card-details">
                 <div class="pp-section-title">Vehicle Details</div>
-
-                <!-- <div class="pp-field">
-                    <div class="pp-label">License Plate</div>
-                    <q-input v-model="form.plate" outlined dense class="pp-input" placeholder="">
-                        <template v-slot:prepend>
-                            <q-icon name="badge" class="pp-input-icon" />
-                        </template>
-                    </q-input>
-                    <div class="pp-help">This will be linked to your QR code.</div>
-                </div> -->
-
                 <div class="pp-field">
                     <div class="pp-label">Vehicle Type</div>
                     <div class="pp-type-row">
@@ -161,8 +149,7 @@
         </div>
         <input ref="fileInput" type="file" accept="image/*" style="display:none" @change="on_file_change" />
         <div class="pp-bottom-bar">
-            <q-btn class="pp-save-btn bg-white text-dark" unelevated no-caps icon="check" label="Save Vehicle"
-                @click="save_vehicle" />
+            <q-btn class="pp-save-btn bg-white text-dark" unelevated no-caps icon="check" label="Save Vehicle" @click="save_vehicle" />
         </div>
     </q-page>
 </template>
@@ -214,7 +201,7 @@ export default {
     },
     async mounted() {
         var { user_id } = this.$route.params;
-        if (user_id) this.current_user_id = user_id;
+        this.current_user_id = user_id;
     },
     methods: {
         async delete_photo(i) {
@@ -416,7 +403,7 @@ export default {
             var backend_url = import.meta.env.VITE_BACKEND_URL;
             console.log(backend_url + '/picture/' + _id);
             return backend_url + '/picture/' + _id;
-        },
+        }
     }
 };
 </script>
@@ -433,6 +420,7 @@ export default {
     align-items: center;
     justify-content: space-between;
     padding: 6px 10px 0 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .pp-back {

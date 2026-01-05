@@ -44,11 +44,9 @@ export default {
       return import.meta.env.VITE_PUBLIC_GOOGLE_CLIENT_ID;
     }
   },
-
   mounted() {
     this.initGoogleOnce();
   },
-
   methods: {
     initGoogleOnce() {
       if (this.initialized) return;
@@ -82,7 +80,6 @@ export default {
         '/auth/google',
         { id_token }
       );
-      console.log("google login service -> " + JSON.stringify(response));
       return response.status === 200;
     },
 

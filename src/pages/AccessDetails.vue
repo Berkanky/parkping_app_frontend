@@ -1,238 +1,205 @@
 <template>
-  <q-page class="pp-page q-pa-md">
-    <div class="topbar">
-      <div class="topbar-spacer" />
-      <!-- <div class="topbar-title">My Public Codes</div> -->
-<!--       <q-btn round dense flat class="topbar-plus" icon="add" @click="onAdd" />
- -->    </div>
-
-    <!-- <div class="section-head q-mt-md">
-      <div class="section-label">CURRENT ACCESS</div>
-      <div v-if="isLive" class="live-pill">
-        <span class="dot" />
-        <span class="live-text">Live</span>
-      </div>
-    </div> -->
-
-    <!-- READY -->
-    <q-card v-if="current_access_state === 'ready'" class="active-card q-mt-sm" flat>
-      <div class="active-card-inner">
-        <div class="active-card-head">
-          <div class="head-left">
-            <div class="lock-wrap">
-              <q-icon name="lock" size="18px" class="lock-ic" />
-            </div>
-            <div class="head-txt">
-              <div class="head-sub">Public Access Token</div>
-            </div>
-          </div>
-
-          <q-btn round dense flat icon="more_horiz" class="more-btn" :disable="!active_access_detail?.public_code">
-            <q-menu class="pp-actions-menu" content-class="pp-actions-menu" anchor="bottom right" self="top right"
-              :offset="[0, 10]" transition-show="jump-down" transition-hide="jump-up">
-              <div class="pp-actions">
-                <button class="pp-act" type="button" @click="onDownloadPdf" v-close-popup>
-                  <span class="pp-act-ic">
-                    <q-icon name="picture_as_pdf" size="18px" />
-                  </span>
-                  <span class="pp-act-txt">
-                    <span class="pp-act-title">Download PDF</span>
-                    <span class="pp-act-sub">Save your QR as a file</span>
-                  </span>
-                </button>
-
-                <div class="pp-act-divider" />
-
-                <button class="pp-act pp-act-danger" type="button" @click="onDisableAccess" v-close-popup>
-                  <span class="pp-act-ic pp-act-ic-danger">
-                    <q-icon name="block" size="18px" />
-                  </span>
-                  <span class="pp-act-txt">
-                    <span class="pp-act-title">Disable access</span>
-                    <span class="pp-act-sub">Revoke current public code</span>
-                  </span>
-                </button>
-              </div>
-            </q-menu>
-          </q-btn>
-        </div>
-
-        <div class="qr-wrap q-mt-md">
-          <div class="qr-frame">
-            <q-img v-if="active_access_detail && active_access_detail.qr_data" :src="active_access_detail.qr_data"
-              fit="contain" class="qr-img" no-spinner />
-            <div v-else class="qr-skeleton" />
-          </div>
-        </div>
-
-        <div class="code-pill q-mt-md">
-          <div class="code-text">{{ formattedPublicCode(active_access_detail?.public_code) }}</div>
-          <q-btn round dense flat icon="content_copy" class="copy-btn"
-            @click="copyCode(active_access_detail?.public_code)" :disable="!active_access_detail?.public_code" />
-        </div>
-
-        <div class="stats-row q-mt-md">
-          <div class="stat">
-            <div class="stat-ic"><q-icon name="calendar_today" size="16px" /></div>
-            <div class="stat-meta">
-              <div class="stat-label">CREATED</div>
-              <div class="stat-val">{{ active_access_detail?.created_date || "-" }}</div>
-            </div>
-          </div>
-
-          <div class="stat">
-            <div class="stat-ic"><q-icon name="qr_code_2" size="16px" /></div>
-            <div class="stat-meta">
-              <div class="stat-label">SCANS</div>
-              <div class="stat-val">{{ safeNum(active_access_detail?.use_count) }}</div>
-            </div>
-          </div>
-
-          <div class="stat">
-            <div class="stat-ic"><q-icon name="history" size="16px" /></div>
-            <div class="stat-meta">
-              <div class="stat-label">LAST USED</div>
-              <div class="stat-val">{{ lastUsedText(active_access_detail?.last_used_date) }}</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </q-card>
-
-    <!-- LOADING -->
-    <q-card v-else-if="current_access_state === 'loading'" class="active-card q-mt-sm" flat>
-      <div class="active-card-inner">
-        <div class="active-card-head">
-          <div class="head-left">
-            <div class="lock-wrap">
-              <q-icon name="lock" size="18px" class="lock-ic" />
-            </div>
-            <div class="head-txt">
-              <div class="head-sub">Public Access Token</div>
-            </div>
-          </div>
-          <q-btn round dense flat icon="more_horiz" class="more-btn" disable />
-        </div>
-
-        <div class="qr-wrap q-mt-md">
-          <div class="qr-frame">
-            <div class="qr-skeleton" />
-          </div>
-        </div>
-
-        <div class="code-pill q-mt-md">
-          <div class="code-text">---- ----</div>
-          <q-btn round dense flat icon="content_copy" class="copy-btn" disable />
-        </div>
-
-        <div class="stats-row q-mt-md">
-          <div class="stat">
-            <div class="stat-ic"><q-icon name="calendar_today" size="16px" /></div>
-            <div class="stat-meta">
-              <div class="stat-label">CREATED</div>
-              <div class="stat-val">-</div>
-            </div>
-          </div>
-          <div class="stat">
-            <div class="stat-ic"><q-icon name="qr_code_2" size="16px" /></div>
-            <div class="stat-meta">
-              <div class="stat-label">SCANS</div>
-              <div class="stat-val">-</div>
-            </div>
-          </div>
-          <div class="stat">
-            <div class="stat-ic"><q-icon name="history" size="16px" /></div>
-            <div class="stat-meta">
-              <div class="stat-label">LAST USED</div>
-              <div class="stat-val">-</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </q-card>
-
-    <!-- EMPTY -->
-    <q-card v-else-if="current_access_state === 'empty'" class="active-card q-mt-sm" flat>
-      <div class="active-card-inner">
-        <div class="active-card-head">
-          <div class="head-left">
-            <div class="lock-wrap">
-              <q-icon name="lock" size="18px" class="lock-ic" />
-            </div>
-            <div class="head-txt">
-              <div class="head-sub">Public Access Token</div>
-            </div>
-          </div>
-          <q-btn round dense flat icon="more_horiz" class="more-btn" disable />
-        </div>
-
-        <div class="empty-state q-mt-md">
-          <div class="empty-ic">
-            <q-icon name="qr_code_2" size="22px" />
-          </div>
-          <div class="empty-title">No active access</div>
-          <div class="empty-desc">Create a public code to share your profile via QR.</div>
-
-          <q-btn unelevated no-caps class="empty-cta q-mt-md" icon="add" label="Create access" @click="onAdd" />
-        </div>
-      </div>
-    </q-card>
-
-    <!-- ERROR -->
-    <q-card v-else class="active-card q-mt-sm" flat>
-      <div class="active-card-inner">
-        <div class="active-card-head">
-          <div class="head-left">
-            <div class="lock-wrap">
-              <q-icon name="error_outline" size="18px" class="lock-ic" />
-            </div>
-            <div class="head-txt">
-              <div class="head-sub">Public Access Token</div>
-            </div>
-          </div>
-          <q-btn round dense flat icon="refresh" class="more-btn" @click="get_current_access_details" />
-        </div>
-
-        <div class="empty-state q-mt-md">
-          <div class="empty-ic empty-ic-warn">
-            <q-icon name="wifi_off" size="22px" />
-          </div>
-          <div class="empty-title">Could not load</div>
-          <div class="empty-desc">Try again. If it keeps happening, the API is having a bad day.</div>
-
-          <q-btn unelevated no-caps class="empty-cta q-mt-md" icon="refresh" label="Retry"
-            @click="get_current_access_details" />
-        </div>
-      </div>
-    </q-card>
-
-    <div class="section-head q-mt-lg">
-      <div class="section-label">REVOKED HISTORY</div>
+  <q-page class="pp-page">
+    <div class="vd-topbar">
+      <q-btn flat round dense icon="chevron_left" class="vd-icon" v-on:click="go_back()" />
     </div>
-
-    <q-card class="revoked-card q-mt-sm" flat>
-      <div class="revoked-inner">
-        <div v-for="row in revoked_profile_access_details" :key="row._id" class="revoked-item">
-          <div class="revoked-left">
-            <div class="mini-qr">
-              <q-icon name="qr_code_2" size="18px" />
+    <div class="vd-content">
+      <q-card v-if="current_access_state === 'ready'" class="active-card" flat>
+        <div class="active-card-inner">
+          <div class="active-card-head">
+            <div class="head-left">
+              <div class="lock-wrap">
+                <q-icon name="lock" size="18px" class="lock-ic" />
+              </div>
+              <div class="head-txt">
+                <div class="head-sub">Public Access Token</div>
+              </div>
             </div>
-            <div class="revoked-texts">
-              <div class="revoked-code">{{ formattedPublicCode(row.public_code) }}</div>
-              <div class="revoked-sub">
-                <q-icon name="event_busy" size="14px" class="sub-ic" />
-                <span>Revoked - {{ row.revoked_date || "-" }}</span>
+            <q-btn round dense flat icon="more_horiz" class="more-btn" :disable="!active_access_detail?.public_code">
+              <q-menu class="pp-actions-menu" content-class="pp-actions-menu" anchor="bottom right" self="top right"
+                :offset="[0, 10]" transition-show="jump-down" transition-hide="jump-up">
+                <div class="pp-actions">
+                  <button class="pp-act" type="button" @click="download_pdf" v-close-popup>
+                    <span class="pp-act-ic">
+                      <q-icon name="picture_as_pdf" size="18px" />
+                    </span>
+                    <span class="pp-act-txt">
+                      <span class="pp-act-title">Download PDF</span>
+                      <span class="pp-act-sub">Save your QR as a file</span>
+                    </span>
+                  </button>
+                  <div class="pp-act-divider" />
+                  <button class="pp-act pp-act-danger" type="button" @click="disable_access" v-close-popup>
+                    <span class="pp-act-ic pp-act-ic-danger">
+                      <q-icon name="block" size="18px" />
+                    </span>
+                    <span class="pp-act-txt">
+                      <span class="pp-act-title">Disable access</span>
+                      <span class="pp-act-sub">Revoke current public code</span>
+                    </span>
+                  </button>
+                </div>
+              </q-menu>
+            </q-btn>
+          </div>
+          <div class="qr-wrap q-mt-md">
+            <div class="qr-frame">
+              <q-img v-if="active_access_detail && active_access_detail.qr_data" :src="active_access_detail.qr_data"
+                fit="contain" class="qr-img" no-spinner />
+              <div v-else class="qr-skeleton" />
+            </div>
+          </div>
+          <div class="code-pill q-mt-md">
+            <div class="code-text">{{ active_access_detail?.public_code }}</div>
+            <q-btn round dense flat icon="content_copy" class="copy-btn"
+              @click="copy_code(active_access_detail?.public_code)" :disable="!active_access_detail?.public_code" />
+          </div>
+          <div class="stats-row q-mt-md">
+            <div class="stat">
+              <div class="stat-ic"><q-icon name="calendar_today" size="16px" /></div>
+              <div class="stat-meta">
+                <div class="stat-label">CREATED</div>
+                <div class="stat-val">{{ active_access_detail?.created_date || "-" }}</div>
+              </div>
+            </div>
+            <div class="stat">
+              <div class="stat-ic"><q-icon name="qr_code_2" size="16px" /></div>
+              <div class="stat-meta">
+                <div class="stat-label">SCANS</div>
+                <div class="stat-val">{{ active_access_detail?.use_count }}</div>
+              </div>
+            </div>
+            <div class="stat">
+              <div class="stat-ic"><q-icon name="history" size="16px" /></div>
+              <div class="stat-meta">
+                <div class="stat-label">LAST USED</div>
+                <div class="stat-val">{{ active_access_detail?.last_used_date }}</div>
               </div>
             </div>
           </div>
-          <q-badge class="revoked-badge" rounded>REVOKED</q-badge>
         </div>
+      </q-card>
+      <q-card v-else-if="current_access_state === 'loading'" class="active-card" flat>
+        <div class="active-card-inner">
+          <div class="active-card-head">
+            <div class="head-left">
+              <div class="lock-wrap">
+                <q-icon name="lock" size="18px" class="lock-ic" />
+              </div>
+              <div class="head-txt">
+                <div class="head-sub">Public Access Token</div>
+              </div>
+            </div>
+            <q-btn round dense flat icon="more_horiz" class="more-btn" disable />
+          </div>
 
-        <div v-if="!revoked_profile_access_details || !revoked_profile_access_details.length" class="empty">
-          No revoked tokens.
+          <div class="qr-wrap q-mt-md">
+            <div class="qr-frame">
+              <div class="qr-skeleton" />
+            </div>
+          </div>
+
+          <div class="code-pill q-mt-md">
+            <div class="code-text">---- ----</div>
+            <q-btn round dense flat icon="content_copy" class="copy-btn" disable />
+          </div>
+
+          <div class="stats-row q-mt-md">
+            <div class="stat">
+              <div class="stat-ic"><q-icon name="calendar_today" size="16px" /></div>
+              <div class="stat-meta">
+                <div class="stat-label">CREATED</div>
+                <div class="stat-val">-</div>
+              </div>
+            </div>
+            <div class="stat">
+              <div class="stat-ic"><q-icon name="qr_code_2" size="16px" /></div>
+              <div class="stat-meta">
+                <div class="stat-label">SCANS</div>
+                <div class="stat-val">-</div>
+              </div>
+            </div>
+            <div class="stat">
+              <div class="stat-ic"><q-icon name="history" size="16px" /></div>
+              <div class="stat-meta">
+                <div class="stat-label">LAST USED</div>
+                <div class="stat-val">-</div>
+              </div>
+            </div>
+          </div>
         </div>
+      </q-card>
+      <q-card v-else-if="current_access_state === 'empty'" class="active-card" flat>
+        <div class="active-card-inner">
+          <div class="active-card-head">
+            <div class="head-left">
+              <div class="lock-wrap">
+                <q-icon name="lock" size="18px" class="lock-ic" />
+              </div>
+              <div class="head-txt">
+                <div class="head-sub">Public Access Token</div>
+              </div>
+            </div>
+          </div>
+          <div class="empty-state q-mt-md">
+            <div class="empty-ic">
+              <q-icon name="qr_code_2" size="22px" />
+            </div>
+            <div class="empty-title">No active access</div>
+            <div class="empty-desc">Create a public code to share your profile via QR.</div>
+
+            <q-btn unelevated no-caps class="empty-cta q-mt-md" icon="add" label="Create access" @click="on_add" />
+          </div>
+        </div>
+      </q-card>
+      <q-card v-else class="active-card" flat>
+        <div class="active-card-inner">
+          <div class="active-card-head">
+            <div class="head-left">
+              <div class="lock-wrap">
+                <q-icon name="error_outline" size="18px" class="lock-ic" />
+              </div>
+              <div class="head-txt">
+                <div class="head-sub">Public Access Token</div>
+              </div>
+            </div>
+          </div>
+          <div class="empty-state q-mt-md">
+            <div class="empty-ic empty-ic-warn">
+              <q-icon name="wifi_off" size="22px" />
+            </div>
+            <div class="empty-title">Could not load</div>
+            <div class="empty-desc">Try again. If it keeps happening, the API is having a bad day.</div>
+            <q-btn unelevated no-caps class="empty-cta q-mt-md" icon="refresh" label="Retry" @click="this.on_add();" />
+          </div>
+        </div>
+      </q-card>
+      <div class="section-head q-mt-lg">
+        <div class="section-label">REVOKED HISTORY</div>
       </div>
-    </q-card>
+      <q-card class="revoked-card q-mt-sm" flat>
+        <div class="revoked-inner">
+          <div v-for="row in revoked_profile_access_details" :key="row._id" class="revoked-item">
+            <div class="revoked-left">
+              <div class="mini-qr">
+                <q-icon name="qr_code_2" size="18px" />
+              </div>
+              <div class="revoked-texts">
+                <div class="revoked-code">{{ row.public_code }}</div>
+                <div class="revoked-sub">
+                  <q-icon name="event_busy" size="14px" class="sub-ic" />
+                  <span>Revoked - {{ row.revoked_date || "-" }}</span>
+                </div>
+              </div>
+            </div>
+            <q-badge class="revoked-badge" rounded>REVOKED</q-badge>
+          </div>
+          <div v-if="!revoked_profile_access_details || !revoked_profile_access_details.length" class="empty">
+            No revoked tokens.
+          </div>
+        </div>
+      </q-card>
+    </div>
   </q-page>
 </template>
 
@@ -242,7 +209,12 @@ import notify from "src/utils/notify";
 import { UseStore } from "../stores/store";
 
 export default {
-  name: "MyPublicCodesPage",
+  setup() {
+    var store = UseStore();
+    return {
+      store
+    }
+  },
   data() {
     return {
       store: null,
@@ -252,36 +224,24 @@ export default {
       current_access_state: "loading"
     };
   },
-  computed: {
-    isLive() {
-      return this.current_access_state === "ready" && !!this.active_access_detail?.public_code;
-    }
-  },
   async mounted() {
-    this.store = UseStore();
 
     var { user_id } = this.$route.params;
-    if (user_id) this.current_user_id = user_id;
+    this.current_user_id = user_id;
 
     await this.get_current_access_details();
     await this.get_revoked_access_details();
   },
   methods: {
-    async onDownloadPdf() {
+    go_back(){
+      this.$router.back();
+    },
+    async download_pdf() {
       try {
-        var res = await this.$api.get("/access-token-download", {
-          responseType: "blob",
-          validateStatus: function () { return true; }
-        });
 
-        if (res.status !== 200) {
-          try {
-            var txt = await res.data.text();
-            var j = JSON.parse(txt);
-            if (j && j.notify && j.message) notify.error(j.message);
-          } catch (e) { }
-          return;
-        }
+        var res = await this.$api.get("/access-token-download", {
+          responseType: "blob"
+        });
 
         var blob = new Blob([res.data], { type: "application/pdf" });
 
@@ -292,103 +252,52 @@ export default {
 
         var url = window.URL.createObjectURL(blob);
         var a = document.createElement("a");
+
         a.href = url;
         a.download = name;
+
         document.body.appendChild(a);
         a.click();
         a.remove();
         window.URL.revokeObjectURL(url);
+
       } catch (e) {
         notify.error("Download failed");
       }
     },
-
-    async onDisableAccess() {
-      var res = await this.$api.put("/delete-access-token", null, {
-        validateStatus: function () { return true; }
-      });
-
-      if (res.status !== 200) {
-        if (res?.data?.notify && res?.data?.message) notify.error(res.data.message);
-        return;
-      }
+    async disable_access() {
+      var res = await this.$api.put("/delete-access-token");
+      if (res.status !== 200) return;
 
       await this.get_current_access_details();
       await this.get_revoked_access_details();
     },
-
     async get_current_access_details() {
-      this.current_access_state = "loading";
-
-      var res = await this.$api.get("/my-access-tokens", {
-        validateStatus: function () { return true; }
-      });
-
-      if (res.status === 200) {
-        this.active_access_detail = res.data.access_token_details || null;
-        this.current_access_state = this.active_access_detail ? "ready" : "empty";
-        return;
-      }
-
-      if (res.status === 404) {
-        this.active_access_detail = null;
-        this.current_access_state = "empty";
-        return;
-      }
-
+      this.current_access_state = 'loading';
       this.active_access_detail = null;
-      this.current_access_state = "error";
-      if (res?.data?.notify && res?.data?.message) notify.error(res.data.message);
-    },
 
+      var res = await this.$api.get("/my-access-tokens");
+      if (res.status === 200) {
+        this.active_access_detail = res?.data?.access_token_details || null;
+        this.current_access_state = 'ready';
+      } else {
+        this.current_access_state = null;
+      }
+    },
     async get_revoked_access_details() {
-      var res = await this.$api.get("/revoked-access-tokens", {
-        validateStatus: function () { return true; }
-      });
+      var res = await this.$api.get("/revoked-access-tokens");
+      if (res.status !== 200) return;
 
-      if (res.status !== 200) {
-        if (res?.data?.notify && res?.data?.message) notify.error(res.data.message);
-        return;
-      }
-
-      this.revoked_profile_access_details = res.data.revoked_profile_access_tokens || [];
+      this.revoked_profile_access_details = res.data?.revoked_profile_access_tokens || [];
     },
-
-    formattedPublicCode(code) {
-      if (!code) return "---- ----";
-      return String(code).trim().toUpperCase();
-    },
-
-    safeNum(v) {
-      var n = Number(v);
-      if (!Number.isFinite(n)) return 0;
-      return n;
-    },
-
-    lastUsedText(v) {
-      if (!v) return "-";
-      return String(v);
-    },
-
-    async copyCode(code) {
+    async copy_code(code) {
       if (!code) return;
-      try {
-        await copyToClipboard(String(code));
-        notify.success("Copied");
-      } catch (e) {
-        notify.error("Copy failed");
-      }
+
+      await copyToClipboard(String(code));
     },
-
-    async onAdd() {
-      var res = await this.$api.post("/update-access-token", null, {
-        validateStatus: function () { return true; }
-      });
-
-      if (res.status !== 200) {
-        if (res?.data?.notify && res?.data?.message) notify.error(res.data.message);
-        return;
-      }
+    async on_add() {
+      var res = await this.$api.post("/update-access-token");
+      if (res.status !== 200) return;
 
       await this.get_current_access_details();
     }
@@ -397,44 +306,10 @@ export default {
 </script>
 
 <style scoped>
-/* =========================
-   <style scoped>
-   ========================= */
-
 .pp-page {
   min-height: 100%;
-  background:
-    radial-gradient(1200px 700px at 50% -200px, rgba(120, 170, 255, .18), transparent 55%),
-    radial-gradient(900px 600px at 30% 20%, rgba(70, 120, 255, .12), transparent 55%),
-    radial-gradient(900px 600px at 70% 40%, rgba(50, 255, 200, .08), transparent 55%),
-    linear-gradient(180deg, #0b0f16 0%, #070a10 40%, #05070c 100%);
-  color: #e9edf7;
-}
-
-.topbar {
-  display: grid;
-  grid-template-columns: 40px 1fr 40px;
-  align-items: center;
-  padding-top: 6px;
-}
-
-.topbar-title {
-  text-align: center;
-  font-weight: 700;
-  letter-spacing: .2px;
-  font-size: 18px;
-  opacity: .95;
-}
-
-.topbar-plus {
-  color: #8bb6ff;
-  background: rgba(60, 120, 255, .18);
-  border: 1px solid rgba(120, 170, 255, .25);
-  box-shadow: 0 10px 30px rgba(40, 90, 200, .18);
-}
-
-.topbar-plus :deep(.q-icon) {
-  opacity: .95;
+  background: #1c1c22;
+  color: #ffffff;
 }
 
 .section-head {
@@ -446,60 +321,26 @@ export default {
 .section-label {
   font-size: 12px;
   letter-spacing: 1.2px;
-  color: rgba(233, 237, 247, .55);
+  color: #a9a9b6;
   font-weight: 700;
 }
 
-.live-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding: 6px 12px;
-  border-radius: 9999px;
-  background: rgba(40, 220, 140, .10);
-  border: 1px solid rgba(40, 220, 140, .20);
-  color: rgba(190, 255, 230, .92);
-}
-
-.dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 99px;
-  background: rgba(40, 220, 140, .9);
-  display: inline-block;
-  box-shadow: 0 0 10px rgba(40, 220, 140, .55);
-}
-
-.live-text {
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: .3px;
-  opacity: .95;
-}
-
-.active-card {
-  border-radius: 22px;
-  background: linear-gradient(180deg, rgba(20, 34, 60, .75), rgba(12, 18, 30, .85));
-  border: 1px solid rgba(120, 170, 255, .14);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, .45);
+.active-card,
+.revoked-card {
+  border-radius: 20px;
+  background: #24242b;
+  border: 1px solid #2f2f38;
+  box-shadow: none;
   position: relative;
   overflow: hidden;
 }
 
 .active-card::before {
-  content: "";
-  position: absolute;
-  inset: -60px -40px auto -40px;
-  height: 180px;
-  background: radial-gradient(closest-side, rgba(120, 170, 255, .28), transparent 65%);
-  filter: blur(2px);
-  pointer-events: none;
+  display: none;
 }
 
 .active-card-inner {
   padding: 18px 16px 14px;
-  position: relative;
-  z-index: 1;
 }
 
 .active-card-head {
@@ -514,29 +355,16 @@ export default {
   gap: 10px;
 }
 
-.lock-wrap {
-  width: 28px;
-  height: 28px;
-  border-radius: 10px;
-  background: rgba(40, 120, 255, .14);
-  border: 1px solid rgba(120, 170, 255, .18);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.lock-ic {
-  color: rgba(150, 190, 255, .95);
-}
-
 .head-sub {
   font-size: 13px;
-  color: rgba(233, 237, 247, .72);
+  color: #ffffff;
+  opacity: 0.9;
   font-weight: 700;
 }
 
 .more-btn {
-  color: rgba(233, 237, 247, .65);
+  color: #ffffff;
+  opacity: 0.85;
 }
 
 .qr-wrap {
@@ -548,8 +376,8 @@ export default {
   width: 220px;
   height: 220px;
   border-radius: 22px;
-  background: rgba(0, 0, 0, .30);
-  border: 1px solid rgba(255, 255, 255, .06);
+  background: #1f1f25;
+  border: 1px solid #2f2f38;
   padding: 14px;
   display: flex;
   align-items: center;
@@ -560,26 +388,14 @@ export default {
   width: 100%;
   height: 100%;
   border-radius: 16px;
-  background: rgba(255, 255, 255, .06);
+  background: #24242b;
 }
 
 .qr-skeleton {
   width: 100%;
   height: 100%;
   border-radius: 16px;
-  background: linear-gradient(90deg, rgba(255, 255, 255, .04), rgba(255, 255, 255, .09), rgba(255, 255, 255, .04));
-  background-size: 200% 100%;
-  animation: shimmer 1.4s infinite linear;
-}
-
-@keyframes shimmer {
-  0% {
-    background-position: 0% 0;
-  }
-
-  100% {
-    background-position: 200% 0;
-  }
+  background: #2a2a33;
 }
 
 .code-pill {
@@ -589,25 +405,25 @@ export default {
   gap: 10px;
   padding: 12px 12px 12px 16px;
   border-radius: 16px;
-  background: rgba(0, 0, 0, .35);
-  border: 1px solid rgba(255, 255, 255, .06);
+  background: #1f1f25;
+  border: 1px solid #2f2f38;
 }
 
 .code-text {
   font-size: 22px;
   font-weight: 900;
   letter-spacing: 1.8px;
-  color: rgba(233, 237, 247, .95);
+  color: #ffffff;
 }
 
 .copy-btn {
-  background: rgba(255, 255, 255, .06);
-  border: 1px solid rgba(255, 255, 255, .08);
-  color: rgba(233, 237, 247, .72);
+  background: #2a2a33;
+  border: 1px solid #2f2f38;
+  color: #ffffff;
 }
 
 .copy-btn:active {
-  transform: scale(.98);
+  transform: scale(0.98);
 }
 
 .stats-row {
@@ -622,7 +438,7 @@ export default {
   align-items: center;
   gap: 10px;
   justify-content: center;
-  border-top: 1px solid rgba(255, 255, 255, .06);
+  border-top: 1px solid #2f2f38;
   padding-top: 12px;
 }
 
@@ -630,12 +446,13 @@ export default {
   width: 28px;
   height: 28px;
   border-radius: 10px;
-  background: rgba(255, 255, 255, .04);
-  border: 1px solid rgba(255, 255, 255, .06);
+  background: #2a2a33;
+  border: 1px solid #2f2f38;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: rgba(233, 237, 247, .65);
+  color: #ffffff;
+  opacity: 0.85;
 }
 
 .stat-meta {
@@ -647,7 +464,7 @@ export default {
 .stat-label {
   font-size: 10px;
   letter-spacing: 1px;
-  color: rgba(233, 237, 247, .45);
+  color: #a9a9b6;
   font-weight: 800;
 }
 
@@ -655,14 +472,8 @@ export default {
   margin-top: 2px;
   font-size: 12px;
   font-weight: 700;
-  color: rgba(233, 237, 247, .8);
-}
-
-.revoked-card {
-  border-radius: 20px;
-  background: rgba(10, 14, 22, .65);
-  border: 1px solid rgba(255, 255, 255, .06);
-  box-shadow: 0 18px 50px rgba(0, 0, 0, .38);
+  color: #ffffff;
+  opacity: 0.9;
 }
 
 .revoked-inner {
@@ -676,8 +487,8 @@ export default {
   gap: 10px;
   padding: 12px;
   border-radius: 16px;
-  background: rgba(255, 255, 255, .03);
-  border: 1px solid rgba(255, 255, 255, .05);
+  background: #1f1f25;
+  border: 1px solid #2f2f38;
 }
 
 .revoked-item+.revoked-item {
@@ -695,12 +506,13 @@ export default {
   width: 44px;
   height: 44px;
   border-radius: 14px;
-  background: rgba(255, 255, 255, .04);
-  border: 1px solid rgba(255, 255, 255, .06);
+  background: #2a2a33;
+  border: 1px solid #2f2f38;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: rgba(233, 237, 247, .62);
+  color: #ffffff;
+  opacity: 0.85;
 }
 
 .revoked-texts {
@@ -711,7 +523,7 @@ export default {
   font-weight: 900;
   letter-spacing: 1px;
   font-size: 14px;
-  color: rgba(233, 237, 247, .92);
+  color: #ffffff;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -724,25 +536,25 @@ export default {
   align-items: center;
   gap: 6px;
   font-size: 12px;
-  color: rgba(233, 237, 247, .55);
+  color: #a9a9b6;
 }
 
 .sub-ic {
-  opacity: .7;
+  opacity: 0.8;
 }
 
 .revoked-badge {
-  background: rgba(255, 70, 70, .10);
-  border: 1px solid rgba(255, 70, 70, .20);
-  color: rgba(255, 170, 170, .92);
+  background: transparent;
+  border: 1px solid #ff4d4d;
+  color: #ff4d4d;
   padding: 6px 10px;
   font-weight: 900;
-  letter-spacing: .6px;
+  letter-spacing: 0.6px;
 }
 
 .empty {
   padding: 14px 6px 6px 6px;
-  color: rgba(233, 237, 247, .45);
+  color: #a9a9b6;
   font-weight: 700;
   font-size: 12px;
 }
@@ -751,8 +563,8 @@ export default {
   margin-top: 10px;
   padding: 16px 14px;
   border-radius: 18px;
-  background: rgba(0, 0, 0, .22);
-  border: 1px solid rgba(255, 255, 255, .06);
+  background: #1f1f25;
+  border: 1px solid #2f2f38;
   text-align: center;
 }
 
@@ -764,62 +576,104 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(120, 170, 255, .10);
-  border: 1px solid rgba(120, 170, 255, .14);
-  color: rgba(210, 225, 255, .92);
+  background: #2a2a33;
+  border: 1px solid #2f2f38;
+  color: #ffffff;
 }
 
 .empty-ic-warn {
-  background: rgba(255, 180, 70, .10);
-  border-color: rgba(255, 180, 70, .18);
-  color: rgba(255, 220, 180, .92);
+  background: #2a2a33;
+  border-color: #2f2f38;
+  color: #ffffff;
 }
 
 .empty-title {
   font-weight: 900;
   font-size: 14px;
-  color: rgba(233, 237, 247, .92);
+  color: #ffffff;
 }
 
 .empty-desc {
   margin-top: 6px;
   font-weight: 700;
   font-size: 12px;
-  color: rgba(233, 237, 247, .55);
+  color: #a9a9b6;
 }
 
 .empty-cta {
   border-radius: 14px;
-  background: rgba(120, 170, 255, .18);
-  border: 1px solid rgba(120, 170, 255, .22);
-  color: rgba(233, 237, 247, .92);
-  box-shadow: 0 12px 30px rgba(40, 90, 200, .18);
+  background: #2a2a33;
+  border: 1px solid #2f2f38;
+  color: #ffffff;
+  box-shadow: none;
+}
+
+.vd-content {
+  padding: 10px 14px 18px 14px;
+}
+
+.vd-topbar {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    background: rgba(28, 28, 34, 0.92);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.vd-title {
+    flex: 1;
+    text-align: center;
+    font-weight: 700;
+    font-size: 16px;
+    color: #ffffff;
+    letter-spacing: 0.2px;
+}
+
+.vd-icon {
+    color: #ffffff;
+    opacity: 0.92;
+}
+
+.vd-ok {
+    color: #2eff7b;
+}
+
+.vd-ok:deep(.q-btn) {
+    padding: 0;
+}
+
+.vd-ok:deep(.q-btn__content) {
+    width: 34px;
+    height: 26px;
+    border-radius: 10px;
+    background: rgba(46, 255, 123, 0.12);
+    border: 1px solid rgba(46, 255, 123, 0.28);
+    display: grid;
+    place-items: center;
 }
 </style>
 
 <style>
-/* QMenu teleport => GLOBAL şart */
-
 .pp-actions-menu {
   border-radius: 18px !important;
   padding: 0 !important;
   overflow: hidden !important;
 
-  background:
-    radial-gradient(120px 120px at 20% 10%, rgba(120,170,255,.22), transparent 60%),
-    radial-gradient(160px 160px at 80% 0%, rgba(50,255,200,.14), transparent 55%),
-    linear-gradient(180deg, rgba(18,24,38,.92), rgba(10,14,22,.92)) !important;
+  background: #24242b !important;
+  border: 1px solid #2f2f38 !important;
+  box-shadow: none !important;
 
-  border: 1px solid rgba(255,255,255,.10) !important;
-  box-shadow: 0 30px 90px rgba(0,0,0,.55), 0 0 0 1px rgba(120,170,255,.06) inset !important;
-
-  backdrop-filter: blur(14px) !important;
-  -webkit-backdrop-filter: blur(14px) !important;
-
-  color: rgba(233,237,247,.92) !important;
+  color: #ffffff !important;
 }
 
-.pp-actions-menu .q-focus-helper { display: none !important; }
+.pp-actions-menu .q-focus-helper {
+  display: none !important;
+}
 
 .pp-actions-menu .pp-actions {
   min-width: 270px !important;
@@ -829,7 +683,6 @@ export default {
   gap: 8px !important;
 }
 
-/* Button reset + layout (asıl fix burada) */
 .pp-actions-menu .pp-act {
   all: unset !important;
   box-sizing: border-box !important;
@@ -842,21 +695,19 @@ export default {
   border-radius: 14px !important;
   padding: 12px 12px !important;
 
-  background: rgba(255,255,255,.04) !important;
-  border: 1px solid rgba(255,255,255,.06) !important;
+  background: #1f1f25 !important;
+  border: 1px solid #2f2f38 !important;
 
   cursor: pointer !important;
   -webkit-tap-highlight-color: transparent !important;
 }
 
 .pp-actions-menu .pp-act:hover {
-  background: rgba(120,170,255,.10) !important;
-  border-color: rgba(120,170,255,.16) !important;
+  background: #2a2a33 !important;
 }
 
 .pp-actions-menu .pp-act:active {
-  transform: scale(.99) !important;
-  background: rgba(120,170,255,.14) !important;
+  transform: scale(0.99) !important;
 }
 
 .pp-actions-menu .pp-act-ic {
@@ -868,14 +719,13 @@ export default {
   align-items: center !important;
   justify-content: center !important;
 
-  background: rgba(120,170,255,.10) !important;
-  border: 1px solid rgba(120,170,255,.14) !important;
-  color: rgba(210,225,255,.92) !important;
+  background: #2a2a33 !important;
+  border: 1px solid #2f2f38 !important;
+  color: #ffffff !important;
 
   flex: 0 0 auto !important;
 }
 
-/* TEXT STACK: title üstte, sub altta */
 .pp-actions-menu .pp-act-txt {
   min-width: 0 !important;
   flex: 1 1 auto !important;
@@ -891,8 +741,8 @@ export default {
   display: block !important;
   font-weight: 900 !important;
   font-size: 13px !important;
-  letter-spacing: .2px !important;
-  color: rgba(233,237,247,.94) !important;
+  letter-spacing: 0.2px !important;
+  color: #ffffff !important;
 
   white-space: nowrap !important;
   overflow: hidden !important;
@@ -903,7 +753,7 @@ export default {
   display: block !important;
   font-weight: 700 !important;
   font-size: 11px !important;
-  color: rgba(233,237,247,.58) !important;
+  color: #a9a9b6 !important;
 
   white-space: nowrap !important;
   overflow: hidden !important;
@@ -913,17 +763,17 @@ export default {
 .pp-actions-menu .pp-act-divider {
   height: 1px !important;
   margin: 0 8px !important;
-  background: rgba(255,255,255,.08) !important;
+  background: #2f2f38 !important;
 }
 
-/* Danger */
 .pp-actions-menu .pp-act-danger:hover {
-  background: rgba(255,70,70,.10) !important;
-  border-color: rgba(255,70,70,.18) !important;
+  background: #2a2a33 !important;
+  border-color: #ff4d4d !important;
 }
+
 .pp-actions-menu .pp-act-ic-danger {
-  background: rgba(255,70,70,.10) !important;
-  border-color: rgba(255,70,70,.18) !important;
-  color: rgba(255,190,190,.92) !important;
+  background: #2a2a33 !important;
+  border-color: #ff4d4d !important;
+  color: #ff4d4d !important;
 }
 </style>

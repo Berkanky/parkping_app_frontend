@@ -14,23 +14,22 @@
 import { UseStore } from "../stores/store";
 
 export default {
-    name: "SplashScreen",
     setup() {
-        const store = UseStore();
+        var store = UseStore();
         return { store };
     },
     data() {
         return {
-            timeoutId: null
+            timeout_id: null
         };
     },
     mounted() {
-        this.timeoutId = setTimeout(() => {
+        this.timeout_id = setTimeout(() => {
             this.$router.replace({ path: "/home" });
         }, 3500);
     },
     beforeUnmount() {
-        if (this.timeoutId) clearTimeout(this.timeoutId);
+        if (this.timeout_id) clearTimeout(this.timeout_id);
     }
 };
 </script>

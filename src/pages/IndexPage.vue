@@ -1,32 +1,26 @@
 <template>
   <q-page class="pp-page">
-
     <div v-if="!vehicles.length" class="pp-empty">
       <q-icon name="directions_car" size="64px" color="positive" />
       <div class="pp-empty-title">
         You're in! Add your first car now.
       </div>
     </div>
-
     <div v-else class="pp-list">
       <div v-for="(data, key) in vehicles" :key="data._id || key">
         <vehicle_card :_id="data._id" :make="data.make" :model="data.model" :plate="data.plate" :color="data.color"
           :example_picture_id="data.example_picture_id" @selected_vehicle_id="get_selected_vehicle_id" />
       </div>
     </div>
-
     <div class="pp-bottom-bar">
       <q-btn class="pp-add-btn bg-white text-dark" unelevated no-caps icon="add" label="Add Vehicle"
         @click="go_add_vehicle_page" />
     </div>
-
   </q-page>
-
 </template>
 
 <script>
 import { UseStore } from '../stores/store';
-
 import vehicle_card from '../components/vehicle_card.vue';
 
 export default {
@@ -54,15 +48,14 @@ export default {
     get_selected_vehicle_id(_id) {
       var vehicle_id = _id;
       if (!vehicle_id) return;
+
       this.$router.push({ name: 'vehicle-profile', params: { vehicle_id: vehicle_id } });
     },
     async get_my_vehicles() {
-
       var res = await this.$api.get('/my-vehicles');
-      console.log("my_vehicles_service -> " + JSON.stringify(res));
       if (res.status !== 200) return;
 
-      this.vehicles = res.data.vehicles;
+      this.vehicles = res.data?.vehicles || [];
     }
   }
 };
@@ -102,7 +95,6 @@ export default {
 
 .pp-empty {
   height: calc(100vh - 56px);
-  /* header varsa */
   display: flex;
   flex-direction: column;
   align-items: center;

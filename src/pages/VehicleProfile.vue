@@ -1,11 +1,10 @@
 <template>
     <q-page class="vd-page">
         <div class="vd-topbar">
-            <q-btn flat round dense icon="arrow_back" class="vd-icon" v-on:click="goBack()" />
+            <q-btn flat round dense icon="chevron_left" class="vd-icon" v-on:click="go_back()" />
             <div class="vd-title">Vehicle Detail</div>
-            <q-btn flat round dense icon="check_circle" class="vd-icon vd-ok" />
+            <q-btn flat round dense icon="verified" class="vd-icon vd-ok" />
         </div>
-
         <div class="vd-content">
             <div class="vd-gallery">
                 <div class="vd-gallery-track">
@@ -17,26 +16,24 @@
                     </div>
                 </div>
             </div>
-
             <div class="vd-head">
                 <div class="vd-head-row">
                     <div class="vd-veh-name">{{ this.vehicle_detail.make }}</div>
                 </div>
                 <div class="vd-veh-sub">{{ this.vehicle_detail.model }}</div>
             </div>
-
             <div class="vd-plate">
                 <div class="vd-plate-label">LICENSE PLATE</div>
                 <div class="vd-plate-value">{{ this.vehicle_detail.plate }}</div>
             </div>
-            <q-banner class="vd-notice" rounded v-if="this.vehicle_detail?.conversation_messages && this.vehicle_detail.conversation_messages.length">
+            <q-banner class="vd-notice" rounded
+                v-if="this.vehicle_detail?.conversation_messages && this.vehicle_detail.conversation_messages.length">
                 <template #avatar>
                     <q-icon name="warning" />
                 </template>
                 <div class="vd-notice-title">Active Notice</div>
                 <div class="vd-notice-text">{{ this.vehicle_detail?.conversation_messages[0].message }}</div>
-            </q-banner> 
-
+            </q-banner>
             <div class="vd-section">
                 <div class="vd-section-title">Vehicle Specifications</div>
                 <q-separator class="vd-sep" />
@@ -66,12 +63,10 @@
                     </div>
                 </div>
             </div>
-
             <div class="vd-section">
                 <div class="vd-owner-row">
                     <div class="vd-section-title q-mb-none">Owner Information</div>
                 </div>
-
                 <q-card flat bordered class="vd-owner-card">
                     <q-item class="vd-owner-top" clickable v-ripple>
                         <q-item-section avatar>
@@ -85,11 +80,9 @@
                             <q-item-label caption class="vd-owner-verified">Verified Owner</q-item-label>
                         </q-item-section>
                     </q-item>
-
                     <q-separator />
-
                     <q-item class="vd-field vd-copy" clickable v-ripple
-                        @click="copyText(this.vehicle_detail?.owner_details?.formatted_phone_number, 'Phone copied')">
+                        @click="copy_text(this.vehicle_detail?.owner_details?.formatted_phone_number, 'Phone copied')">
                         <q-item-section avatar>
                             <q-icon name="call" class="vd-field-ic" />
                         </q-item-section>
@@ -97,22 +90,21 @@
                             <q-item-label class="vd-field-k">Phone Number</q-item-label>
                             <q-item-label class="vd-field-v">{{
                                 this.vehicle_detail?.owner_details?.formatted_phone_number
-                                }}</q-item-label>
+                            }}</q-item-label>
                         </q-item-section>
                         <q-item-section side>
                             <q-icon name="content_copy" class="vd-copy-ic" />
                         </q-item-section>
                     </q-item>
-
                     <q-item class="vd-field vd-copy" clickable v-ripple
-                        @click="copyText(this.vehicle_detail.owner_details.email_address, 'Email copied')">
+                        @click="copy_text(this.vehicle_detail.owner_details.email_address, 'Email copied')">
                         <q-item-section avatar>
                             <q-icon name="mail" class="vd-field-ic" />
                         </q-item-section>
                         <q-item-section>
                             <q-item-label class="vd-field-k">Email Address</q-item-label>
                             <q-item-label class="vd-field-v">{{ this.vehicle_detail?.owner_details?.email_address
-                                }}</q-item-label>
+                            }}</q-item-label>
                         </q-item-section>
                         <q-item-section side>
                             <q-icon name="content_copy" class="vd-copy-ic" />
@@ -120,8 +112,6 @@
                     </q-item>
                 </q-card>
             </div>
-
-            <!-- normal bottom button (not sticky) -->
             <div class="vd-bottom">
                 <q-btn unelevated no-caps class="vd-cta" :disable="!this.vehicle_detail?.owner_details?.allow_message">
                     <q-icon name="chat_bubble" class="vd-cta-ic" />
@@ -162,16 +152,16 @@ export default {
     async created() {
         var { vehicle_id } = this.$route.params;
         await this.get_vehicle_detail(vehicle_id);
-        this.WSConnect();
+        this.ws_connect();
     },
     beforeUnmount() {
-        this.cleanupWS(true);
+        this.clean_up_ws(true);
         clearTimeout(this.resumeTimer);
     },
     methods: {
-        goBack(){
-            if( this.$router ) this.$router.back();
-            else this.$router.push({name:'home'});
+        go_back() {
+            if (this.$router) this.$router.back();
+            else this.$router.push({ name: 'home' });
         },
         async get_vehicle_detail(vehicle_id) {
             var res = await this.$api.post('/vehicle-detail', { vehicle_id: vehicle_id });
@@ -189,26 +179,26 @@ export default {
             clearTimeout(this.debounceTimer);
             this.debounceTimer = setTimeout(() => {
                 var vehicle_id = this.vehicle_id;
-                this.sendWS({ conversation_message: this.conversation_message, vehicle_id: vehicle_id });
+                this.send_data_to_ws({ conversation_message: this.conversation_message, vehicle_id: vehicle_id });
             }, 300);
         },
-        WSConnect() {
+        ws_connect() {
             var web_socket_api_url = import.meta.env.VITE_WEB_SOCKET_API_URL;
             try {
                 this.socket = new WebSocket(web_socket_api_url);
                 console.log(this.socket)
             } catch (e) {
                 console.error("Web Socket Error. ", e);
-                return this.scheduleReconnect();
+                return this.schedule_reconnect();
             }
 
             this.socket.onopen = () => {
                 this.reconnectAttempts = 0;
-                this.flushQueue();
-                this.startHeartbeat();
+                this.flush_queue();
+                this.start_heart_beat();
                 if (this.conversation_message) {
                     var vehicle_id = this.vehicle_id;
-                    this.sendWS({ conversation_message: this.conversation_message, vehicle_id: vehicle_id });
+                    this.send_data_to_ws({ conversation_message: this.conversation_message, vehicle_id: vehicle_id });
                 }
             };
 
@@ -223,40 +213,40 @@ export default {
 
             this.socket.onerror = (err) => console.warn("Web Socket Error. ", err?.message || err);
             this.socket.onclose = () => {
-                this.stopHeartbeat();
-                if (!this.isManualClose) this.scheduleReconnect();
+                this.stop_heart_beat();
+                if (!this.isManualClose) this.schedule_reconnect();
             };
         },
-        sendWS(payload) {
+        send_data_to_ws(payload) {
             var data = JSON.stringify(payload);
             if (this.socket && this.socket.readyState === WebSocket.OPEN) this.socket.send(data);
             else this.sendQueue.push(data);
         },
-        flushQueue() {
+        flush_queue() {
             while (this.sendQueue.length && this.socket?.readyState === WebSocket.OPEN) {
                 this.socket.send(this.sendQueue.shift());
             }
         },
-        scheduleReconnect() {
+        schedule_reconnect() {
             var delay = Math.min(1000 * Math.pow(2, this.reconnectAttempts++), 15000);
             clearTimeout(this.reconnectTimer);
-            this.reconnectTimer = setTimeout(() => this.WSConnect(), delay);
+            this.reconnectTimer = setTimeout(() => this.ws_connect(), delay);
         },
-        startHeartbeat() {
-            this.stopHeartbeat();
+        start_heart_beat() {
+            this.stop_heart_beat();
             this.heartbeatTimer = setInterval(() => {
                 if (this.socket?.readyState === WebSocket.OPEN)
                     this.socket.send(JSON.stringify({ type: "ping", t: Date.now() }));
             }, 25_000);
         },
-        stopHeartbeat() {
+        stop_heart_beat() {
             clearInterval(this.heartbeatTimer);
             this.heartbeatTimer = null;
         },
-        cleanupWS(manual = false) {
+        clean_up_ws(manual = false) {
             this.isManualClose = manual;
             clearTimeout(this.reconnectTimer);
-            this.stopHeartbeat();
+            this.stop_heart_beat();
 
             if (this.socket && this.socket.readyState !== WebSocket.CLOSED) {
                 try { this.socket.close(1000, "client closing"); }
@@ -268,7 +258,7 @@ export default {
             var backend_url = import.meta.env.VITE_BACKEND_URL;
             return backend_url + '/picture/' + file_id;
         },
-        copyText(val, okMsg) {
+        copy_text(val, okMsg) {
             var s = (val === null || val === undefined) ? "" : String(val).trim();
             if (!s || s === "-") return;
             copyToClipboard(s)
@@ -281,7 +271,8 @@ export default {
 
 <style scoped>
 .vd-page {
-    background: #ffffff;
+    background: #1C1C22;
+    color: #ffffff;
 }
 
 .vd-topbar {
@@ -292,24 +283,41 @@ export default {
     display: flex;
     align-items: center;
     padding: 0 12px;
-    background: #ffffff;
+    background: rgba(28, 28, 34, 0.92);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .vd-title {
     flex: 1;
     text-align: center;
-    font-weight: 650;
+    font-weight: 700;
     font-size: 16px;
-    color: #111827;
+    color: #ffffff;
     letter-spacing: 0.2px;
 }
 
 .vd-icon {
-    color: #111827;
+    color: #ffffff;
+    opacity: 0.92;
 }
 
 .vd-ok {
-    color: #2563eb;
+    color: #2eff7b;
+}
+
+.vd-ok:deep(.q-btn) {
+    padding: 0;
+}
+
+.vd-ok:deep(.q-btn__content) {
+    width: 34px;
+    height: 26px;
+    border-radius: 10px;
+    background: rgba(46, 255, 123, 0.12);
+    border: 1px solid rgba(46, 255, 123, 0.28);
+    display: grid;
+    place-items: center;
 }
 
 .vd-content {
@@ -324,7 +332,7 @@ export default {
     display: flex;
     gap: 12px;
     overflow-x: auto;
-    padding-bottom: 2px;
+    padding-bottom: 6px;
     scroll-snap-type: x mandatory;
 }
 
@@ -335,35 +343,38 @@ export default {
 .vd-shot {
     flex: 0 0 auto;
     scroll-snap-align: start;
-    border-radius: 14px;
+    border-radius: 16px;
     overflow: hidden;
-    background: #f3f4f6;
-    box-shadow: 0 8px 24px rgba(17, 24, 39, 0.08);
+    background: #24242b;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.35);
+    position: relative;
 }
 
 .vd-shot--main {
-    width: 240px;
+    width: 248px;
 }
 
 .vd-shot--side {
-    width: 130px;
-    opacity: 0.92;
+    width: 140px;
+    opacity: 0.95;
 }
 
 .vd-shot-img {
-    height: 190px;
-    border-radius: 14px;
+    height: 176px;
+    border-radius: 16px;
 }
 
 .vd-shot-label {
     position: absolute;
     left: 10px;
     bottom: 10px;
-    background: rgba(17, 24, 39, 0.65);
-    color: #fff;
+    background: rgba(12, 12, 16, 0.7);
+    color: #ffffff;
     font-size: 11px;
-    padding: 4px 8px;
+    padding: 5px 9px;
     border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.10);
 }
 
 .vd-head {
@@ -378,48 +389,35 @@ export default {
 
 .vd-veh-name {
     font-size: 20px;
-    font-weight: 750;
-    color: #111827;
+    font-weight: 800;
+    color: #ffffff;
     line-height: 1.1;
     flex: 1;
 }
 
 .vd-veh-sub {
     margin-top: 6px;
-    color: #6b7280;
+    color: rgba(255, 255, 255, 0.62);
     font-size: 12.5px;
-}
-
-.vd-chip {
-    background: #eaf7ee;
-    color: #117a37;
-    border-radius: 10px;
-    font-weight: 650;
-}
-
-.vd-chip-muted {
-    background: #f3f4f6;
-    color: #6b7280;
-    border-radius: 10px;
-    font-weight: 650;
 }
 
 .vd-plate {
     margin-top: 12px;
-    background: #f3f4f6;
-    border-radius: 12px;
+    background: #24242b;
+    border-radius: 14px;
     padding: 12px 12px 12px 14px;
     position: relative;
     overflow: hidden;
-    border: 1px solid #eef2f7;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.28);
 }
 
 .vd-plate:before {
     content: "";
     position: absolute;
     left: 0;
-    top: 10px;
-    bottom: 10px;
+    top: 12px;
+    bottom: 12px;
     width: 4px;
     border-radius: 6px;
     background: #2563eb;
@@ -428,51 +426,67 @@ export default {
 .vd-plate-label {
     font-size: 10px;
     letter-spacing: 0.7px;
-    color: #9ca3af;
-    font-weight: 750;
+    color: rgba(255, 255, 255, 0.55);
+    font-weight: 800;
 }
 
 .vd-plate-value {
     margin-top: 4px;
     font-size: 16px;
-    font-weight: 800;
-    color: #111827;
+    font-weight: 850;
+    color: #ffffff;
 }
 
 .vd-notice {
     margin-top: 12px;
-    background: #fff7ed;
-    border: 1px solid #fed7aa;
-    color: #7c2d12;
-    padding: 10px 12px;
+    background: rgba(255, 149, 0, 0.08);
+    border: 1px solid rgba(255, 149, 0, 0.35);
+    color: #ffffff;
+    padding: 12px 12px;
+    border-radius: 14px;
+    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.22);
+}
+
+.vd-notice :deep(.q-banner__avatar) {
+    min-width: 28px;
+}
+
+.vd-notice :deep(.q-icon) {
+    color: #ff9b1a;
 }
 
 .vd-notice-title {
-    font-weight: 800;
+    font-weight: 850;
     font-size: 13px;
     margin-bottom: 2px;
+    color: #ffb35a;
 }
 
 .vd-notice-text {
     font-size: 12.5px;
-    color: #9a3412;
+    color: rgba(255, 255, 255, 0.86);
     line-height: 1.25;
 }
 
 .vd-notice-sub {
     margin-top: 2px;
     font-size: 12px;
-    color: #b45309;
+    color: rgba(255, 179, 90, 0.9);
 }
 
 .vd-section {
     margin-top: 16px;
+    background: #24242b;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 14px 14px 12px 14px;
+    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.26);
 }
 
 .vd-section-title {
-    font-weight: 800;
+    font-weight: 850;
     font-size: 14px;
-    color: #111827;
+    color: #ffffff;
 }
 
 .vd-owner-row {
@@ -484,6 +498,7 @@ export default {
 
 .vd-sep {
     margin: 10px 0 12px 0;
+    background: rgba(255, 255, 255, 0.08);
 }
 
 .vd-spec-grid {
@@ -494,16 +509,16 @@ export default {
 
 .vd-spec-k {
     font-size: 10px;
-    letter-spacing: 0.6px;
-    color: #9ca3af;
-    font-weight: 800;
+    letter-spacing: 0.65px;
+    color: rgba(255, 255, 255, 0.55);
+    font-weight: 850;
 }
 
 .vd-spec-v {
     margin-top: 4px;
     font-size: 13px;
-    font-weight: 750;
-    color: #111827;
+    font-weight: 800;
+    color: #ffffff;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -513,13 +528,15 @@ export default {
     width: 9px;
     height: 9px;
     border-radius: 999px;
-    box-shadow: inset 0 0 0 1px rgba(17, 24, 39, 0.12);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.22);
 }
 
 .vd-owner-card {
-    border-radius: 14px;
+    background: #24242b;
+    border-radius: 16px;
     overflow: hidden;
-    border: 1px solid #eef2f7;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.26);
 }
 
 .vd-owner-top {
@@ -527,14 +544,22 @@ export default {
     padding-bottom: 12px;
 }
 
+.vd-owner-card :deep(.q-item) {
+    color: #ffffff;
+}
+
+.vd-owner-card :deep(.q-separator) {
+    background: rgba(255, 255, 255, 0.08);
+}
+
 .vd-owner-name {
-    font-weight: 800;
-    color: #111827;
+    font-weight: 850;
+    color: #ffffff;
 }
 
 .vd-owner-verified {
-    color: #6b7280;
-    font-weight: 650;
+    color: rgba(255, 255, 255, 0.62);
+    font-weight: 700;
 }
 
 .vd-avatar-fallback {
@@ -543,9 +568,10 @@ export default {
     border-radius: 999px;
     display: grid;
     place-items: center;
-    background: #e5e7eb;
-    color: #111827;
+    color: #ffffff;
     font-weight: 900;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.10);
 }
 
 .vd-field {
@@ -554,7 +580,7 @@ export default {
 }
 
 .vd-field-ic {
-    color: #111827;
+    color: rgba(255, 255, 255, 0.9);
 }
 
 .vd-copy {
@@ -562,22 +588,21 @@ export default {
 }
 
 .vd-copy-ic {
-    color: #9ca3af;
+    color: rgba(255, 255, 255, 0.55);
 }
 
 .vd-field-k {
     font-size: 12px;
-    color: #6b7280;
-    font-weight: 700;
+    color: rgba(255, 255, 255, 0.62);
+    font-weight: 750;
 }
 
 .vd-field-v {
     font-size: 13px;
-    color: #111827;
-    font-weight: 750;
+    color: #ffffff;
+    font-weight: 800;
 }
 
-/* bottom button as normal block */
 .vd-bottom {
     margin-top: 14px;
     padding: 0 4px 6px 4px;
@@ -585,11 +610,11 @@ export default {
 
 .vd-cta {
     width: 100%;
-    height: 48px;
-    border-radius: 14px;
-    background: #0b0b0d;
-    color: #ffffff;
-    box-shadow: 0 10px 18px rgba(0, 0, 0, 0.14);
+    height: 50px;
+    border-radius: 16px;
+    background: #f3f4f6;
+    color: #111827;
+    box-shadow: 0 14px 22px rgba(0, 0, 0, 0.24);
     padding: 0 14px;
 }
 
@@ -598,7 +623,7 @@ export default {
     justify-content: center;
     align-items: center;
     gap: 10px;
-    font-weight: 800;
+    font-weight: 850;
     font-size: 14.5px;
     letter-spacing: 0.15px;
     line-height: 1;
@@ -606,6 +631,7 @@ export default {
 
 .vd-cta :deep(.q-icon) {
     font-size: 18px;
+    color: #111827;
 }
 
 .vd-cta-ic {

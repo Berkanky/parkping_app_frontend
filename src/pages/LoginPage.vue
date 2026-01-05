@@ -4,7 +4,6 @@
       <div class="hero">
         <q-img class="hero-img" src="../images/login_screen_image_v2.svg" fit="cover" no-spinner />
       </div>
-
       <div class="panel">
         <div class="panel-inner">
           <div class="brand-row">
@@ -18,19 +17,6 @@
 
           <div class="actions">
             <google_login_component />
-
-            <!-- <q-btn class="btn apple-btn" unelevated no-caps @click="onApple">
-              <div class="btn-inner">
-                <span class="btn-icon">
-                  <svg width="18" height="18" viewBox="0 0 384 512" aria-hidden="true">
-                    <path fill="#111317"
-                      d="M318.7 268.6c-.3-37.3 16.6-65.4 52.2-87.1-19.9-28.5-50-44.1-89.7-47.2-37.6-3-78.7 22-93.7 22-15.4 0-51.8-20.9-80.2-20.9C48 135.4 0 180.1 0 271.5 0 298 4.9 325.8 14.7 354.9c13.1 37.3 60.4 128.8 109.8 127.3 26.4-.6 45-18.7 79.3-18.7 33.3 0 50.8 18.7 80 18.7 49.8-.8 92.6-84.2 105.1-121.6-68-32.1-69.9-95.9-70.2-92zM252.2 86.3C281.1 51.8 278.5 20 277.6 8.7c-26 1.5-56 17.3-73.2 37.1-19 21.4-30.2 47.9-27.8 77.4 28.2 2.2 54.2-12.8 75.6-36.9z" />
-                  </svg>
-                </span>
-                <span class="btn-text">Continue with Apple</span>
-              </div>
-            </q-btn> -->
-
             <div class="legal">
               By continuing, you agree to our Term of Service and Privacy Policy.
             </div>
@@ -47,14 +33,6 @@ export default {
   name: "LoginPage",
   components: {
     google_login_component
-  },
-  data() {
-    return {
-    };
-  },
-  methods: {
-    onGoogle() { },
-    onApple() { }
   }
 };
 </script>
@@ -63,13 +41,13 @@ export default {
 .login-page {
   padding: 0;
   margin: 0;
-  background: #111317;
+  background:#1c1c22;
 }
 
 .screen {
   min-height: 100vh;
   width: 100%;
-  background: #111317;
+  background:#1c1c22;
   display: flex;
   flex-direction: column;
 }
@@ -155,12 +133,6 @@ export default {
   background: transparent;
   color: #ffffff;
   border: 2px solid rgba(255, 255, 255, 0.75);
-}
-
-.apple-btn {
-  background: #ffffff;
-  color: #111317;
-  border: 2px solid rgba(255, 255, 255, 0.9);
 }
 
 .legal {
