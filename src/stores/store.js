@@ -12,9 +12,9 @@ export const UseStore = defineStore('UseStore', {
       var end_point = backend_url + '/user-details';
 
       var res = await axios.get(end_point, { withCredentials: true });
-      console.log("auth_details_service -> " + JSON.stringify(res));
       if( res.status !== 200 ) return;
       this.user_data = res.data.user_data;
+      
     }
   },
 })

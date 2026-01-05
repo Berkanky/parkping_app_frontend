@@ -5,7 +5,6 @@
             <div class="pp-title">Add Vehicle</div>
             <div class="pp-topbar-spacer"></div>
         </div>
-
         <div class="pp-content text-white">
             <q-card flat bordered class="pp-card pp-card-details">
                 <div class="pp-plate-head">
@@ -21,10 +20,8 @@
                         Checking...
                     </div>
                 </div>
-
                 <div class="pp-field" style="margin-top:10px">
                     <div class="pp-label">License Plate</div>
-
                     <q-input v-model="form.plate" outlined dense class="pp-input" placeholder="34ABC123"
                         :loading="plate_state === 'checking'" @update:model-value="on_plate_input"
                         @blur="on_plate_blur">
@@ -32,13 +29,11 @@
                             <q-icon name="badge" class="pp-input-icon" />
                         </template>
                     </q-input>
-
                     <div class="pp-help">
                         Type plate. If it exists, we load it and you update. If not, you create.
                     </div>
                 </div>
             </q-card>
-
             <q-card flat bordered class="pp-card"
                 v-if="plate_state === 'found' && (vehicle_existing_pictures || []).length">
                 <div class="pp-card-head">
@@ -46,7 +41,6 @@
                         <div class="pp-card-title">Vehicle Photos</div>
                     </div>
                 </div>
-
                 <div class="pp-photos-row">
                     <div v-for="i in vehicle_existing_pictures" :key="i._id" class="pp-photo-slot pp-photo-filled">
                         <q-img :src="get_vehicle_picture(i._id)" class="pp-photo-img" :ratio="1" fit="cover"
@@ -56,7 +50,6 @@
                     </div>
                 </div>
             </q-card>
-
             <q-card flat bordered class="pp-card">
                 <div class=" pp-card-head">
                     <div class="pp-card-head-left">
@@ -71,7 +64,6 @@
                         tabindex="0">
                         <q-img v-if="photos[i]" :src="photos[i]" class="pp-photo-img" :ratio="1" fit="cover"
                             no-spinner />
-
                         <div v-else class="pp-photo-add-inner">
                             <div class="pp-photo-add-iconwrap">
                                 <q-icon name="photo_camera" size="30px" class="pp-photo-add-icon" />
@@ -79,13 +71,11 @@
                             </div>
                             <div class="pp-photo-add-text">Add Photo</div>
                         </div>
-
                         <q-btn v-if="photos[i]" round unelevated dense size="10px" icon="close" class="pp-photo-remove"
                             @click.stop="remove_photo(i)" />
                     </div>
                 </div>
             </q-card>
-
             <q-card flat bordered class="pp-card pp-card-details">
                 <div class="pp-section-title">Vehicle Details</div>
                 <div class="pp-field">
@@ -96,14 +86,12 @@
                             <q-icon name="directions_car" size="26px" class="pp-type-icon" />
                             <div class="pp-type-text">Car</div>
                         </button>
-
                         <button type="button" class="pp-type"
                             :class="{ 'pp-type-active': form.vehicle_type === 'bike' }"
                             @click="form.vehicle_type = 'bike'">
                             <q-icon name="two_wheeler" size="26px" class="pp-type-icon" />
                             <div class="pp-type-text">Bike</div>
                         </button>
-
                         <button type="button" class="pp-type"
                             :class="{ 'pp-type-active': form.vehicle_type === 'truck' }"
                             @click="form.vehicle_type = 'truck'">
@@ -112,36 +100,30 @@
                         </button>
                     </div>
                 </div>
-
                 <div class="pp-grid-2">
                     <div class="pp-field">
                         <div class="pp-label">Make</div>
                         <q-input v-model="form.make" outlined dense class="pp-input" placeholder="Toyota" />
                     </div>
-
                     <div class="pp-field">
                         <div class="pp-label">Model</div>
                         <q-input v-model="form.model" outlined dense class="pp-input" placeholder="Camry" />
                     </div>
                 </div>
-
                 <div class="pp-field">
                     <div class="pp-label">Color</div>
-
                     <div class="pp-color-row">
                         <button v-for="c in color_options" :key="c.key" type="button" class="pp-color-chip text-white"
                             :class="{ 'pp-color-active': form.color_key === c.key }" @click="select_color(c)">
                             <span class="pp-color-dot" :style="{ background: c.dot }"></span>
                             <span class="pp-color-text">{{ c.label }}</span>
                         </button>
-
                         <button type="button" class="pp-color-chip text-white"
                             :class="{ 'pp-color-active': form.color_key === 'other' }" @click="select_other_color">
                             <span class="pp-color-dot" style="background:#e5e7eb"></span>
                             <span class="pp-color-text">Other</span>
                         </button>
                     </div>
-
                     <q-input v-if="form.color_key === 'other'" v-model="form.color_custom" outlined dense
                         class="pp-input pp-color-custom" placeholder="e.g. Pearl White" />
                 </div>
@@ -192,7 +174,6 @@ export default {
             ],
             plate_state: 'idle', // idle | checking | found | not_found
             editing_vehicle_id: null,
-
             plate_debounce_ms: 650,
             plate_timer: null,
             last_checked_plate: '',
@@ -230,7 +211,6 @@ export default {
         },
         on_plate_blur() {
             var p = this.form.plate;
-
             if (!p || p.length < 4) return;
 
             this.check_plate_and_load(p, { force: true });
@@ -238,7 +218,6 @@ export default {
         async check_plate_and_load(plate, opts) {
             opts = opts || {};
             var force = !!opts.force;
-
             if (!force && plate === this.last_checked_plate) return;
 
             this.plate_state = 'checking';

@@ -1,7 +1,7 @@
 <template>
   <q-page class="pp-page">
     <div v-if="!vehicles.length" class="pp-empty">
-      <q-icon name="directions_car" size="64px" color="positive" />
+      <img src="../images/car_icon.svg">
       <div class="pp-empty-title">
         You're in! Add your first car now.
       </div>

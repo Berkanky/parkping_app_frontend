@@ -17,6 +17,7 @@
 
           <div class="actions">
             <google_login_component />
+            <guest_login_component />
             <div class="legal">
               By continuing, you agree to our Term of Service and Privacy Policy.
             </div>
@@ -28,11 +29,13 @@
 </template>
 
 <script>
+import guest_login_component from 'src/components/guest_login_component.vue';
 import google_login_component from 'src/components/google_login_component.vue';
 export default {
   name: "LoginPage",
   components: {
-    google_login_component
+    google_login_component,
+    guest_login_component
   }
 };
 </script>

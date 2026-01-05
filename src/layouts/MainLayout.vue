@@ -6,14 +6,12 @@
         <q-toolbar-title class="text-center">
           {{ this.dynamic_header_title() }}
         </q-toolbar-title>
-        <q-btn v-if="this.$route.name == 'home'" class="profile_icon" dense flat round icon="person" size=""
-          v-on:click="go_profile_page()" />
+        <div style="width:38px;"></div>
       </q-toolbar>
     </q-header>
     <q-drawer v-model="left_drawer_open" side="left" overlay behavior="mobile" :width="320" class="text-white"
       style="background:  #1c1c22 ;">
       <div class="pp-wrap">
-
         <div class="pp-top">
           <div class="pp-brand">
             <div class="pp-logo">
@@ -23,21 +21,16 @@
             </div>
             <div class="pp-brand-text">ParkPing</div>
           </div>
-
           <q-btn dense flat round icon="chevron_left" class="pp-close" @click="left_drawer_open = false" />
         </div>
-
         <div class="pp-profile">
           <q-avatar size="88px">
             <img :src="userAvatar" alt="avatar" />
           </q-avatar>
-
           <div class="pp-name">{{ fullName }}</div>
           <div class="pp-email">{{ email }}</div>
         </div>
-
         <div class="pp-divider"></div>
-
         <q-list class="pp-menu" padding>
           <q-item clickable v-ripple :active="isActive('/home')" active-class="pp-active" class="pp-item"
             @click="go('/home')">
@@ -48,7 +41,6 @@
               My Cars
             </q-item-section>
           </q-item>
-
           <q-item clickable v-ripple :active="isActive('/profile')" active-class="pp-active" class="pp-item"
             @click="go('/profile')">
             <q-item-section avatar class="pp-icon">
@@ -58,7 +50,6 @@
               Profile
             </q-item-section>
           </q-item>
-
           <q-item clickable v-ripple :active="isActive(`/access-details/${this.store.user_data._id}`)"
             active-class="pp-active" class="pp-item" @click="go(`/access-details/${this.store.user_data._id}`)">
             <q-item-section avatar class="pp-icon">
@@ -68,7 +59,6 @@
               QR History
             </q-item-section>
           </q-item>
-
           <q-item clickable v-ripple :active="isActive('/notifications')" active-class="pp-active" class="pp-item"
             @click="go('/notifications')">
             <q-item-section avatar class="pp-icon">
@@ -78,17 +68,22 @@
               Notifications
             </q-item-section>
           </q-item>
+          <q-item clickable v-ripple :active="isActive('/verify-access-token')" active-class="pp-active" class="pp-item"
+            @click="go('/verify-access-token')">
+            <q-item-section avatar class="pp-icon">
+              <q-icon name="search" />
+            </q-item-section>
+            <q-item-section class="pp-text">
+              Public Code
+            </q-item-section>
+          </q-item>
         </q-list>
-
         <div class="pp-spacer"></div>
-
         <div class="pp-bottom">
           <q-btn outline no-caps class="pp-logout" icon="logout" label="Logout" @click="this.logout_service()" />
         </div>
-
       </div>
     </q-drawer>
-
     <q-page-container>
       <router-view />
     </q-page-container>
@@ -251,7 +246,7 @@ export default {
 }
 
 .pp-active {
-  background: #252424 !important;
+  background: #24242b !important;
 }
 
 .pp-active .pp-text {
