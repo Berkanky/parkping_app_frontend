@@ -8,6 +8,7 @@
 import axios from 'axios';
 import { UseStore } from './stores/store';
 import { defineComponent } from 'vue';
+import { AddressbarColor } from 'quasar'
 
 export default defineComponent({
   name: 'App',
@@ -18,6 +19,7 @@ export default defineComponent({
     }
   },
   async mounted() {
+    AddressbarColor.set('#1c1c22');
     await this.store.get_user_details();
   }
 });
