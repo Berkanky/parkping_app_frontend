@@ -2,9 +2,8 @@
     <q-page class="pp-auth">
         <div class="pp-topbar text-white">
             <q-btn flat round icon="chevron_left" class="pp-back" @click="go_back" />
-            <q-space></q-space>
-            <q-avatar size="sm">
-                <img src="../images//parkping_app_logo_black.svg" alt="">
+            <q-avatar size="md" class="pp-logo">
+                <img src="../images/splash_screen_logo.svg" alt="">
             </q-avatar>
         </div>
         <div class="pp-wrap">
@@ -39,12 +38,16 @@ export default {
         }
     },
     methods: {
-        go_back(){
-            this.$router.back();
+        go_back() {
+            if (window.history.length > 1) {
+                this.$router.back();
+            } else {
+                this.$router.replace({ name: 'home' });
+            }
         },
         async on_search() {
             var res = await this.$api.post('/search-vehicle-plate', { plate: this.plate });
-            if( res.status !== 200 ) return;
+            if (res.status !== 200) return;
 
             var { vehicle_id } = res.data;
 
@@ -63,12 +66,12 @@ export default {
 }
 
 .pp-topbar {
-    height: 52px;
+    height: 64px;
     display: flex;
     align-items: center;
     padding: 6px 10px 0 10px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-    flex: 0 0 auto;
+    position: relative;
 }
 
 .pp-wrap {
@@ -165,11 +168,26 @@ export default {
 }
 
 .pp-btn {
-  width: min(92%, 440px);
+    width: min(92%, 440px);
     border-radius: 12px;
     background: #ffffff;
     color: #1c1c22;
     font-size: 16px;
     font-weight: 500;
+}
+
+.pp-logo {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 104px;
+    height: 64px;
+}
+
+.pp-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
 }
 </style>

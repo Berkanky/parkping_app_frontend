@@ -131,7 +131,8 @@
         </div>
         <input ref="fileInput" type="file" accept="image/*" style="display:none" @change="on_file_change" />
         <div class="pp-bottom-bar">
-            <q-btn class="pp-save-btn bg-white text-dark" unelevated no-caps icon="check" label="Save Vehicle" @click="save_vehicle" />
+            <q-btn class="pp-save-btn bg-white text-dark" unelevated no-caps icon="check" label="Save Vehicle"
+                @click="save_vehicle" />
         </div>
     </q-page>
 </template>
@@ -305,8 +306,11 @@ export default {
             this.$nextTick(() => { });
         },
         go_back() {
-            if (this.$router) this.$router.back();
-            else this.$router.push({ name: 'home' });
+            if (window.history.length > 1) {
+                this.$router.back();
+            } else {
+                this.$router.replace({ name: 'home' });
+            }
         },
         pick_photo(slot) {
             if (slot < 0 || slot > 2) return;

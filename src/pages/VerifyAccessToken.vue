@@ -2,17 +2,15 @@
     <q-page class="pp-auth">
         <div class="pp-topbar text-white">
             <q-btn flat round icon="chevron_left" class="pp-back" @click="go_back" />
-            <q-space></q-space>
-            <q-avatar size="sm">
-                <img src="../images//parkping_app_logo_black.svg" alt="">
+            <q-avatar size="md" class="pp-logo">
+                <img src="../images/splash_screen_logo.svg" alt="">
             </q-avatar>
         </div>
 
         <div class="pc-wrap">
             <div class="pc-mid">
                 <div class="pc-title">Public Code</div>
-
-                <q-input v-model="public_code" class="pc-input text-white" borderless placeholder="Ex. PP-7K2D9A"
+                <q-input v-model="public_code" class="pc-input text-white" borderless placeholder="Ex. PPPP-SSSS"
                     input-class="pc-input-native" />
             </div>
 
@@ -36,15 +34,19 @@ export default {
             public_code: ""
         }
     },
-    async mounted(){
+    async mounted() {
         var { qr_code_token } = this.$route.query;
-        if( qr_code_token ) await this.verify_qr_code(qr_code_token);
+        if (qr_code_token) await this.verify_qr_code(qr_code_token);
     },
     methods: {
-        go_back(){
-            this.$router.back();
+        go_back() {
+            if (window.history.length > 1) {
+                this.$router.back();
+            } else {
+                this.$router.replace({ name: 'home' });
+            }
         },
-        async verify_qr_code(qr_code_token){
+        async verify_qr_code(qr_code_token) {
             var res = await this.$api.post('/verify-access-token', { qr_code_token: qr_code_token });
             if (res.status !== 200) return;
 
@@ -72,12 +74,12 @@ export default {
 }
 
 .pp-topbar {
-    height: 52px;
+    height: 64px;
     display: flex;
     align-items: center;
     padding: 6px 10px 0 10px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-    flex: 0 0 auto;
+    position: relative;
 }
 
 .pp-back {
@@ -148,5 +150,20 @@ export default {
     color: #1c1c22;
     font-size: 16px;
     font-weight: 500;
+}
+
+.pp-logo {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 104px;
+    height: 64px;
+}
+
+.pp-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
 }
 </style>

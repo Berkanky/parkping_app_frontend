@@ -95,7 +95,7 @@
                             <q-item-label class="vd-field-k">Phone Number</q-item-label>
                             <q-item-label class="vd-field-v">{{
                                 this.vehicle_detail?.owner_details?.formatted_phone_number
-                            }}</q-item-label>
+                                }}</q-item-label>
                         </q-item-section>
                         <q-item-section side>
                             <q-icon name="content_copy" class="vd-copy-ic" />
@@ -109,7 +109,7 @@
                         <q-item-section>
                             <q-item-label class="vd-field-k">Email Address</q-item-label>
                             <q-item-label class="vd-field-v">{{ this.vehicle_detail?.owner_details?.email_address
-                            }}</q-item-label>
+                                }}</q-item-label>
                         </q-item-section>
                         <q-item-section side>
                             <q-icon name="content_copy" class="vd-copy-ic" />
@@ -165,8 +165,11 @@ export default {
     },
     methods: {
         go_back() {
-            if (this.$router) this.$router.back();
-            else this.$router.push({ name: 'home' });
+            if (window.history.length > 1) {
+                this.$router.back();
+            } else {
+                this.$router.replace({ name: 'home' });
+            }
         },
         async get_vehicle_detail(vehicle_id) {
             var res = await this.$api.post('/vehicle-detail', { vehicle_id: vehicle_id });
