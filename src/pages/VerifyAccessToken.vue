@@ -38,9 +38,7 @@ export default {
     },
     async mounted(){
         var { qr_code_token } = this.$route.query;
-        if( qr_code_token ){
-            await this.verify_qr_code(qr_code_token);
-        }
+        if( qr_code_token ) await this.verify_qr_code(qr_code_token);
     },
     methods: {
         go_back(){
