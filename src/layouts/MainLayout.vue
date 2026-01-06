@@ -19,7 +19,7 @@
                 <img src="../images/parkping_app_logo_black.svg" />
               </q-avatar>
             </div>
-            <div class="pp-brand-text">ParkPing</div>
+            <div class="pp-brand-text">ParkPing <span style="font-size:10px;">- {{ this.store.app_version }}</span></div>
           </div>
           <q-btn dense flat round icon="chevron_left" class="pp-close" @click="left_drawer_open = false" />
         </div>

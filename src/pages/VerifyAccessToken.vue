@@ -36,7 +36,7 @@ export default {
             public_code: ""
         }
     },
-    async created(){
+    async mounted(){
         var { qr_code_token } = this.$route.query;
         if( qr_code_token ){
             await this.verify_qr_code(qr_code_token);
