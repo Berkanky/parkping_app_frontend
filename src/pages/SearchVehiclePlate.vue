@@ -63,6 +63,10 @@ export default {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    background-image: url("../images/BG-parkping.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
 }
 
 .pp-topbar {

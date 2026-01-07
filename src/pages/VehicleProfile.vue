@@ -2,8 +2,8 @@
     <q-page class="vd-page">
         <div class="vd-topbar">
             <q-btn flat round dense icon="chevron_left" class="vd-icon" v-on:click="go_back()" />
-            <div class="vd-title">Vehicle Detail</div>
-            <div style="width:35px"></div>
+            <!-- <div class="vd-title">Vehicle Detail</div>
+            <div style="width:35px"></div> -->
             <!-- <q-btn flat round dense icon="verified" class="vd-icon vd-ok" /> -->
         </div>
         <div class="vd-content">
@@ -24,7 +24,7 @@
                 <div class="vd-veh-sub">{{ this.vehicle_detail.model }}</div>
             </div> -->
             <div class="vd-plate">
-                <div class="vd-plate-label">Vehicle Make/Model</div>
+                <div class="vd-plate-label">MAKE/MODEL</div>
                 <div class="vd-plate-value">{{ this.vehicle_detail.make }} - {{ this.vehicle_detail.model }}</div>
             </div>
             <div class="vd-plate">

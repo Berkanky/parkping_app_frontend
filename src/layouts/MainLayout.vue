@@ -4,7 +4,7 @@
       <q-toolbar class="q-px-md" style="height:56px;">
         <q-btn dense flat round icon="menu" @click="leftDrawerToggle()" />
         <q-toolbar-title class="text-center">
-          {{ this.dynamic_header_title() }}
+          <!-- {{ this.dynamic_header_title() }} -->
         </q-toolbar-title>
         <div style="width:38px;"></div>
       </q-toolbar>
@@ -19,7 +19,7 @@
                 <img src="../images/parkping_app_logo_black.svg" />
               </q-avatar>
             </div>
-            <div class="pp-brand-text">ParkPing <span style="font-size:10px;">- {{ this.store.app_version }}</span></div>
+            <div class="pp-brand-text">ParkPing <!-- <span style="font-size:10px;">- {{ this.store.app_version }}</span> --></div>
           </div>
           <q-btn dense flat round icon="chevron_left" class="pp-close" @click="left_drawer_open = false" />
         </div>
@@ -71,10 +71,10 @@
           <q-item clickable v-ripple :active="isActive('/verify-access-token')" active-class="pp-active" class="pp-item"
             @click="go('/verify-access-token')">
             <q-item-section avatar class="pp-icon">
-              <q-icon name="search" />
+              <q-icon name="search"/>
             </q-item-section>
             <q-item-section class="pp-text">
-              Public Code
+              Scan Vehicle
             </q-item-section>
           </q-item>
         </q-list>
@@ -267,8 +267,10 @@ export default {
 
 .pp-logout {
   width: 100%;
-  border-radius: 7px;
-  font-weight: 700;
+  height: 34px;
+  border-radius: 18px;
+  font-weight: 850;
+  letter-spacing: .2px;
 }
 
 .pp-version {

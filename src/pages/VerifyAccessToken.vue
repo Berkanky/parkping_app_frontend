@@ -1,27 +1,58 @@
 <template>
-    <q-page class="pp-auth">
-        <div class="pp-topbar text-white">
-            <q-btn flat round icon="chevron_left" class="pp-back" @click="go_back" />
-            <q-avatar size="md" class="pp-logo">
-                <img src="../images/splash_screen_logo.svg" alt="">
-            </q-avatar>
+    <q-page class="pp-search-page">
+        <div class="pp-topbar">
+            <q-btn flat round icon="chevron_left" color="dark" class="pp-back-btn" @click="go_back" />
         </div>
 
-        <div class="pc-wrap">
-            <div class="pc-mid">
-                <div class="pc-title">Public Code</div>
-                <q-input v-model="public_code" class="pc-input text-white" borderless placeholder="Ex. PPPP-SSSS"
-                    input-class="pc-input-native" />
+        <div class="pp-container">
+            <div class="qr-card">
+                <div class="qr-icon-wrap">
+                    <q-icon name="qr_code_scanner" size="50px" color="positive" />
+                </div>
+
+                <div class="qr-title">QR Code Scan</div>
+                <div class="qr-subtitle">
+                    Open the camera and scan the QR code on the vehicle. Swipe.
+                </div>
+
+                <q-btn icon="camera" outline rounded no-caps label="Camera" class="qr-btn" @click="open_scanner" />
+                <div v-show="scanner_open" class="qr-reader-wrap">
+                    <div id="qr-reader"></div>
+
+                    <q-btn flat no-caps class="qr-cancel" label="Cancel" @click="close_scanner" />
+                </div>
             </div>
 
-            <div class="pc-bottom">
-                <q-btn icon="search" unelevated no-caps class="pc-btn" label="Search" @click="on_search" />
+            <div class="pp-separator">
+                <div class="sep-line"></div>
+                <div class="sep-text">OR</div>
+                <div class="sep-line"></div>
+            </div>
+
+            <div class="public-section">
+                <div class="pc-header">Public Code</div>
+                <div class="pc-subheader">Search by entering the vehicle's general code.</div>
+
+                <q-input v-model="public_code" rounded outlined bg-color="white" placeholder="EX. PPPP-SSSS"
+                    class="pc-input-field">
+                    <template v-slot:prepend>
+                        <q-icon name="tag" size="xs" color="grey-6" />
+                    </template>
+                </q-input>
+
+                <q-btn unelevated rounded no-caps class="search-btn" @click="on_search">
+                    <div class="row items-center justify-center full-width">
+                        <span>Search</span>
+                        <q-icon name="search" size="xs" color="positive" class="q-ml-sm" />
+                    </div>
+                </q-btn>
             </div>
         </div>
     </q-page>
 </template>
 
 <script>
+import { Html5Qrcode } from "html5-qrcode";
 import { UseStore } from 'src/stores/store';
 export default {
     name: "PublicCodeSearch",
@@ -31,8 +62,15 @@ export default {
     },
     data() {
         return {
-            public_code: ""
+            public_code: "",
+            scanner_open: false,
+            scanning: false,
+            qr: null,
+            scan_lock: false
         }
+    },
+    beforeUnmount() {
+        this.close_scanner();
     },
     async mounted() {
         var { qr_code_token } = this.$route.query;
@@ -60,110 +98,240 @@ export default {
             if (res.status !== 200) return;
 
             this.$router.push({ name: 'search-vehicle-plate' });
+        },
+        async open_scanner() {
+            if (this.scanning) return;
+
+            this.scanner_open = true;
+            this.scan_lock = false;
+
+            this.$nextTick(async () => {
+                try {
+                    this.qr = new Html5Qrcode("qr-reader");
+                    this.scanning = true;
+
+                    await this.qr.start(
+                        { facingMode: "environment" },
+                        { fps: 12, qrbox: { width: 240, height: 240 } },
+                        async (decodedText) => {
+                            if (this.scan_lock) return;
+                            this.scan_lock = true;
+
+                            await this.close_scanner();
+
+                            var txt = (decodedText || "").trim();
+                            if (!txt) return;
+
+                            try {
+                                var url = new URL(txt);
+                                var token = url.searchParams.get("qr_code_token");
+                                if (token) return await this.verify_qr_code(token);
+
+                                var publicCode = url.searchParams.get("public_code");
+                                if (publicCode) {
+                                    this.public_code = publicCode;
+                                    return await this.on_search();
+                                }
+                            } catch (err) { console.error(err); }
+
+                            await this.verify_qr_code(txt);
+                        },
+                        () => { }
+                    );
+                } catch (e) {
+                    this.scanning = false;
+                    this.qr = null;
+                    this.scanner_open = false;
+                    this.$q.notify({ type: "negative", message: "Camera/QR scan failed." });
+                }
+            });
+        },
+        async close_scanner() {
+            try {
+                if (this.qr && this.scanning) {
+                    await this.qr.stop();
+                    await this.qr.clear();
+                }
+            } catch (err) {
+                console.error(err);
+            } finally {
+                this.scanning = false;
+                this.qr = null;
+                this.scanner_open = false;
+            }
         }
     }
 }
 </script>
 
-<style>
-.pp-auth {
-    background: #1c1c22;
-    min-height: 100vh;
+<style scoped>
+.qr-reader-wrap {
+    margin-top: 18px;
     display: flex;
     flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+#qr-reader {
+    width: 100%;
+    max-width: 420px;
+    border-radius: 22px;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.06);
+}
+
+.qr-cancel {
+    color: #718096;
 }
 
 .pp-topbar {
-    height: 64px;
     display: flex;
-    align-items: center;
-    padding: 6px 10px 0 10px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-    position: relative;
-}
-
-.pp-back {
-    width: 40px;
-    height: 40px;
-    border-radius: 14px;
-}
-
-.pc-wrap {
-    flex: 1 1 auto;
-    display: flex;
-    flex-direction: column;
-    padding: 28px 18px 22px;
-}
-
-.pc-mid {
-    flex: 1 1 auto;
-    display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 14px;
+    height: 70px;
+    position: relative;
+    padding: 0 10px;
 }
 
-.pc-title {
-    color: #ffffff;
+.pp-back-btn {
+    position: absolute;
+    left: 10px;
+    z-index: 10;
+}
+
+.pp-brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pp-logo-img {
+    height: 32px;
+    width: auto;
+    object-fit: contain;
+}
+
+.pp-search-page {
+    background: linear-gradient(180deg, #f1f8f6 0%, #ffffff 100%);
+    min-height: 100vh;
+    padding: 10px;
+}
+
+.pp-brand-text {
+    font-size: 22px;
+    font-weight: 800;
+    color: #1a202c;
+    letter-spacing: -0.5px;
+}
+
+.pp-container {
+    padding: 15px;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.qr-card {
+    background: white;
+    border-radius: 40px;
+    padding: 40px 20px;
+    text-align: center;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
+    margin-bottom: 40px;
+}
+
+.qr-icon-wrap {
+    background: #f0fdf4;
+    width: 90px;
+    height: 90px;
+    border-radius: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 25px;
+}
+
+.qr-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1a202c;
+    margin-bottom: 10px;
+}
+
+.qr-subtitle {
+    font-size: 15px;
+    color: #718096;
+    line-height: 1.5;
+    margin-bottom: 30px;
+    padding: 0 30px;
+}
+
+.qr-btn {
+    color: #718096;
+    border-color: #edf2f7;
+    padding: 8px 35px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.pp-separator {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 40px;
+}
+
+.sep-line {
+    flex: 1;
+    height: 1px;
+    background: #e2e8f0;
+}
+
+.sep-text {
+    font-size: 12px;
+    color: #cbd5e0;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+
+.pc-header {
     font-size: 22px;
     font-weight: 700;
+    color: #1a202c;
     text-align: center;
+    margin-bottom: 5px;
 }
 
-.pc-input {
-    width: min(92%, 440px);
-    background: #24242b;
-    border-radius: 12px;
-    padding: 6px 14px;
-    height: 56px;
-    display: flex;
-    align-items: center;
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .05);
+.pc-subheader {
+    font-size: 14px;
+    color: #718096;
+    text-align: center;
+    margin-bottom: 25px;
 }
 
-.pc-input .q-field__control,
-.pc-input .q-field__control-container {
-    height: 56px;
+.pc-input-field {
+    margin-bottom: 20px;
+    box-shadow: 0 10px 20px rgba(72, 187, 120, 0.08);
 }
 
-.pc-input-native {
-    color: #ffffff !important;
-    font-size: 16px;
-    letter-spacing: .2px;
-}
-
-.pc-input .q-field__native::placeholder {
-    color: rgba(255, 255, 255, .35);
-}
-
-.pc-bottom {
-    display: flex;
-    justify-content: center;
-    padding-top: 14px;
-}
-
-.pc-btn {
-    width: min(92%, 440px);
-    border-radius: 12px;
-    background: #ffffff;
-    color: #1c1c22;
-    font-size: 16px;
-    font-weight: 500;
-}
-
-.pp-logo {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    width: 104px;
-    height: 64px;
-}
-
-.pp-logo img {
+.search-btn {
     width: 100%;
-    height: 100%;
-    object-fit: contain;
+    height: 60px;
+    background: #121826;
+    color: white;
+    font-size: 18px;
+    font-weight: 600;
+    border-radius: 20px;
+}
+
+:deep(.q-field--outlined .q-field__control) {
+    border-radius: 20px !important;
+    height: 60px;
+    border: 2px solid transparent;
+}
+
+:deep(.q-field--outlined .q-field__control:before) {
+    border: 1px solid #e2e8f0;
 }
 </style>

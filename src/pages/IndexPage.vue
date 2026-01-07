@@ -7,9 +7,10 @@
       </div>
     </div>
     <div v-else class="pp-list">
-      <div v-for="(data, key) in vehicles" :key="data._id || key">
+      <div 
+        v-for="(data, key) in vehicles" :key="data._id || key">
         <vehicle_card :_id="data._id" :make="data.make" :model="data.model" :plate="data.plate" :color="data.color"
-          :example_picture_id="data.example_picture_id" @selected_vehicle_id="get_selected_vehicle_id" />
+          :example_picture_id="data.example_picture_id" @selected_vehicle_id="get_selected_vehicle_id" @deleted_vehicle_id="get_deleted_vehicle_id"/>
       </div>
     </div>
     <div class="pp-bottom-bar">
@@ -35,13 +36,23 @@ export default {
   },
   data: function () {
     return {
-      vehicles: []
+      vehicles: [],
+      selected_vehicles:[]
     }
   },
   async mounted() {
     await this.get_my_vehicles();
   },
   methods: {
+    async get_deleted_vehicle_id(_id){
+      var vehicle_id = _id;
+      if (!vehicle_id) return;
+      
+      var res = await this.$api.put('/delete-vehicle', { vehicle_id: vehicle_id });
+      if( res.status !== 204 ) return;
+
+      this.vehicles = this.vehicles.filter(function(item){ return item._id !== vehicle_id });
+    },
     go_add_vehicle_page() {
       this.$router.push({ name: 'add-vehicle', params: { user_id: this.store.user_data._id } });
     },
@@ -65,6 +76,10 @@ export default {
 .pp-page {
   padding: 14px 14px 0 14px;
   background: #1C1C22;
+  background-image: url("../images/BG-parkping.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 .pp-list {

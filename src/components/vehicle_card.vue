@@ -1,42 +1,29 @@
 <template>
-  <q-card class="pp-vehicle-card" flat bordered>
-    <q-item clickable v-ripple class="pp-item" @click="go_detail(_id)">
-      <q-item-section avatar class="pp-avatar">
-        <div class="pp-img-wrap">
-          <q-img class="pp-img" :src="example_picture_id ? get_vehicle_example_picture() : undefined" :ratio="4 / 3"
-            fit="cover" no-spinner>
-            <template v-slot:loading>
-              <div class="pp-img-ph">
-                <q-spinner size="24px" />
-              </div>
-            </template>
-            <template v-slot:error>
-              <div class="pp-img-ph">
-                <q-icon name="directions_car" size="28px" />
-                <div class="pp-img-ph-text">No Picture</div>
-              </div>
-            </template>
-            <template v-slot:default>
-              <div v-if="!example_picture_id" class="pp-img-ph">
-                <q-icon name="add_a_photo" size="28px" />
-                <div class="pp-img-ph-text">Add Image</div>
-              </div>
-            </template>
-          </q-img>
+  <q-card class="pp-vehicle-card" flat>
+    <div class="pp-row">
+      <div class="pp-img-wrap">
+        <q-img class="pp-img"
+          :src="example_picture_id ? get_vehicle_example_picture() : 'https://images.unsplash.com/photo-1583121274602-3e2820c69888?q=80&w=1000&auto=format&fit=crop'"
+          fit="cover" no-spinner />
+        <div class="pp-trash">
+          <q-btn round dense flat icon="delete_outline" class="pp-trash-btn" v-on:click="this.delete_vehicle(_id)" />
         </div>
-      </q-item-section>
-      <q-item-section class="pp-content">
-        <div class="pp-title text-white">{{ make }}</div>
-        <div class="pp-subtitle text-grey-6">{{ model }} - {{ color }}</div>
-        <div class="pp-plate text-white">
-          <q-icon name="badge" size="16px" class="pp-plate-icon" />
-          <div class="pp-plate-text">{{ plate }}</div>
+      </div>
+
+      <div class="pp-content">
+        <div class="pp-make">{{ make }}</div>
+        <div class="pp-model">{{ model }}</div>
+
+        <div class="pp-meta">
+          {{ plate }} <span class="pp-divider">|</span> {{ color }}
         </div>
-      </q-item-section>
-      <q-item-section side class="pp-side" aria-hidden="true">
-        <q-icon name="chevron_right" class="pp-right-icon text-white" />
-      </q-item-section>
-    </q-item>
+      </div>
+
+      <div class="pp-side">
+        <q-btn flat round dense icon="chevron_right" color="white" size="20px" class="pp-side-btn"
+          @click="this.go_detail(_id)" />
+      </div>
+    </div>
   </q-card>
 </template>
 
@@ -52,7 +39,7 @@ export default {
     color: { type: String, default: '-' },
     example_picture_id: { type: String, default: '' }
   },
-  emits: ['selected_vehicle_id'],
+  emits: ['selected_vehicle_id', 'deleted_vehicle_id'],
   setup() {
     var store = UseStore();
     return { store };
@@ -64,6 +51,9 @@ export default {
     },
     go_detail(_id) {
       this.$emit('selected_vehicle_id', _id);
+    },
+    delete_vehicle(_id) {
+      this.$emit('deleted_vehicle_id', _id);
     }
   }
 }
@@ -71,103 +61,96 @@ export default {
 
 <style scoped>
 .pp-vehicle-card {
-  width: 100%;
-  border-radius: 10px;
-  background: #24242b;
-  border: 1px solid rgba(17, 24, 39, 0.06);
-  box-shadow: 0 10px 28px rgba(17, 24, 39, 0.06);
+  border-radius: 28px;
+  background: #1c1e26;
   overflow: hidden;
+  max-width: 500px;
 }
 
-.pp-item {
-  padding: 11px;
-  min-height: unset;
-  transition: transform 0.12s ease;
-}
-
-.pp-item:active {
-  transform: scale(0.992);
-}
-
-.pp-avatar {
-  padding-right: 14px;
+.pp-row {
+  display: flex;
+  height: 150px;
+  width: 100%;
+  position: relative;
+  align-items: center;
 }
 
 .pp-img-wrap {
-  width: 118px;
-  border-radius: 10px;
-  overflow: hidden;
-  border: 1px solid rgba(17, 24, 39, 0.06);
-  background: #24242b;
+  width: 150px;
+  height: 150px;
+  position: relative;
+  padding: 12px;
 }
 
 .pp-img {
-  border-radius: 10px;
-}
-
-.pp-img-ph {
-  width: 100%;
+  border-radius: 24px;
   height: 100%;
-  min-height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  background: #24242b;
+  width: 100%;
 }
 
-.pp-img-ph-text {
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.2px;
+.pp-trash {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 2;
+}
+
+.pp-trash-btn {
+  width: 32px;
+  height: 32px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(8px);
+  color: #fff;
 }
 
 .pp-content {
-  min-width: 0;
-}
-
-.pp-title {
-  font-size: 18px;
-  font-weight: 850;
-  line-height: 1.15;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.pp-subtitle {
-  margin-top: 5px;
-  font-size: 14px;
-  font-weight: 650;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.pp-plate {
-  margin-top: 10px;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 10px;
-  border-radius: 12px;
-  background: #24242b;
-}
-
-.pp-plate-text {
-  font-size: 13px;
-  font-weight: 850;
-  letter-spacing: 1.1px;
-}
-
-.pp-side {
-  width: 34px;
-  padding-left: 10px;
+  flex: 1;
+  padding: 20px 10px 20px 5px;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
   justify-content: center;
 }
 
-.pp-right-icon {
-  font-size: 24px;
+.pp-make {
+  font-size: 22px;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.5px;
+}
+
+.pp-model {
+  font-size: 15px;
+  font-weight: 500;
+  margin-top: 4px;
+  opacity: 0.95;
+}
+
+.pp-meta {
+  margin-top: 8px;
+  font-size: 15px;
+  font-weight: 400;
+  color: #a0a4b0;
+}
+
+.pp-divider {
+  margin: 0 4px;
+  opacity: 0.5;
+}
+
+.pp-side {
+  padding-right: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pp-side-btn {
+  opacity: 0.8;
+  transition: opacity 0.3s;
+}
+
+.pp-side-btn:hover {
+  opacity: 1;
 }
 </style>
