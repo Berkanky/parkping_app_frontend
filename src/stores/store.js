@@ -2,7 +2,7 @@ import { defineStore, acceptHMRUpdate } from 'pinia';
 import axios from 'axios';
 export const UseStore = defineStore('UseStore', {
   state: () => ({
-    app_version: "1.0.2",
+    app_version: "1.0.3",
     app_name:"parkping",
     user_data: {}
   }),

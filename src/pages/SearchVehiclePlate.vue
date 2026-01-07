@@ -51,7 +51,7 @@ export default {
 
             var { vehicle_id } = res.data;
 
-            this.$router.push({ name: 'vehicle-profile', params: { vehicle_id: vehicle_id } });
+            this.$router.replace({ name: 'vehicle-profile', params: { vehicle_id: vehicle_id } });
         }
     }
 }

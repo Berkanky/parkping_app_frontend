@@ -127,14 +127,7 @@ export default {
                                 var token = url.searchParams.get("qr_code_token");
                                 if (token) return await this.verify_qr_code(token);
 
-                                var publicCode = url.searchParams.get("public_code");
-                                if (publicCode) {
-                                    this.public_code = publicCode;
-                                    return await this.on_search();
-                                }
                             } catch (err) { console.error(err); }
-
-                            await this.verify_qr_code(txt);
                         },
                         () => { }
                     );
