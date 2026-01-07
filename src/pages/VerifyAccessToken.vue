@@ -55,7 +55,6 @@
 import { Html5Qrcode } from "html5-qrcode";
 import { UseStore } from 'src/stores/store';
 export default {
-    name: "PublicCodeSearch",
     setup() {
         var store = UseStore();
         return { store }
@@ -87,14 +86,12 @@ export default {
         async verify_qr_code(qr_code_token) {
             try {
                 var res = await this.$api.post('/verify-access-token', { qr_code_token });
-                if (res?.status === 200) {
-                    this.$router.push({ name: 'search-vehicle-plate' });
-                    return true;
-                }
-                this.$q.notify({ type: "negative", message: "Token doğrulanamadı." });
-                return false;
+                if (res.status !== 200) return false;
+
+                this.$router.push({ name: 'search-vehicle-plate' });
+                return true;
             } catch (err) {
-                this.$q.notify({ type: "negative", message: "Doğrulama hatası (API)." });
+                console.error(err);
                 return false;
             }
         },
@@ -104,13 +101,12 @@ export default {
 
             try {
                 var res = await this.$api.post('/verify-access-token', { public_code: code });
-                if (res?.status === 200) {
-                    this.$router.push({ name: 'search-vehicle-plate' });
-                    return;
-                }
-                this.$q.notify({ type: "negative", message: "Kod doğrulanamadı." });
+                if (res.status !== 200) return;
+                
+                this.$router.push({ name: 'search-vehicle-plate' });
+                return;
             } catch (err) {
-                this.$q.notify({ type: "negative", message: "Arama hatası (API)." });
+                console.error(err);
             }
         },
         async open_scanner() {
@@ -128,6 +124,7 @@ export default {
                         { facingMode: "environment" },
                         { fps: 12, qrbox: { width: 240, height: 240 } },
                         async (decodedText) => {
+
                             if (this.scan_lock) return;
                             this.scan_lock = true;
 
@@ -137,22 +134,19 @@ export default {
                                 return;
                             }
 
-                            let token = null;
+                            var token = null;
 
-                            // 1) URL ise
                             try {
                                 var url = new URL(txt);
                                 token = url.searchParams.get("qr_code_token");
                             } catch (e) { }
 
-                            // 2) URL değilse (bazı QR'lar sadece parametre basar)
                             if (!token) {
                                 var m = txt.match(/(?:\?|&)qr_code_token=([^&]+)/i);
                                 if (m && m[1]) token = decodeURIComponent(m[1]);
                             }
 
                             if (!token) {
-                                this.$q.notify({ type: "negative", message: "QR içinde qr_code_token bulunamadı." });
                                 this.scan_lock = false;
                                 return;
                             }
@@ -165,11 +159,11 @@ export default {
 
                         () => { }
                     );
-                } catch (e) {
+                } catch (err) {
                     this.scanning = false;
                     this.qr = null;
                     this.scanner_open = false;
-                    this.$q.notify({ type: "negative", message: "Camera/QR scan failed." });
+                    console.error(err);
                 }
             });
         },
