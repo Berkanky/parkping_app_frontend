@@ -384,7 +384,6 @@ export default {
         },
         get_vehicle_picture(_id) {
             var backend_url = import.meta.env.VITE_BACKEND_URL;
-            console.log(backend_url + '/picture/' + _id);
             return backend_url + '/picture/' + _id;
         }
     }

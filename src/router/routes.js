@@ -12,6 +12,8 @@ const routes = [
       { path:'access-details/:user_id', name:'access-details', props: true, component:() => import('pages/AccessDetails.vue'),  meta: { requires_auth: true, is_avaliable_for_temporary_users: false } },
       { path: 'search-vehicle-plate', name:'search-vehicle-plate', component: () => import('pages/SearchVehiclePlate.vue'), meta: { requires_auth: true, is_avaliable_for_temporary_users: true  } },
       { path: 'verify-access-token', name:'verify-access-token', component: () => import('src/pages/VerifyAccessToken.vue'), meta: { requires_auth: true, is_avaliable_for_temporary_users: true  } },
+      { path: 'send-message', name: 'send-message', props: true, component:() => import('src/pages/SendMessagePage.vue'), meta: { requires_auth: true, is_avaliable_for_temporary_users: false } },
+      { path: 'vehicle-profile-messages', name: 'vehicle-profile-messages', props: true, component:() => import('src/pages/VehicleProfileMessages.vue'), meta: { requires_auth: true, is_avaliable_for_temporary_users: false } }
     ]
   },
   {

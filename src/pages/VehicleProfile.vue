@@ -32,12 +32,13 @@
                 <div class="vd-plate-value">{{ this.vehicle_detail.plate }}</div>
             </div>
             <q-banner class="vd-notice" rounded
+                v-on:click="go_vehicle_profile_messages()"
                 v-if="this.vehicle_detail?.conversation_messages && this.vehicle_detail.conversation_messages.length">
                 <template #avatar>
                     <q-icon name="warning" />
                 </template>
                 <div class="vd-notice-title">Active Notice</div>
-                <div class="vd-notice-text">{{ this.vehicle_detail?.conversation_messages[0].message }}</div>
+                <div class="vd-notice-text">{{ this.vehicle_detail?.conversation_messages[this.vehicle_detail?.conversation_messages.length - 1].message }}</div>
             </q-banner>
             <div class="vd-section">
                 <div class="vd-section-title">Vehicle Specifications</div>
@@ -118,7 +119,10 @@
                 </q-card>
             </div>
             <div class="vd-bottom">
-                <q-btn unelevated no-caps class="vd-cta" :disable="!this.vehicle_detail?.owner_details?.allow_message">
+                <q-btn 
+                    v-on:click="send_message_to_vehicle_owner()"
+                    :disabled="this.is_user_temporary() && this.is_vehicle_owner_allow_message()"
+                    unelevated no-caps class="vd-cta" :disable="!this.vehicle_detail?.owner_details?.allow_message">
                     <q-icon name="chat_bubble" class="vd-cta-ic" />
                     <span class="vd-cta-txt">Leave Message</span>
                 </q-btn>
@@ -164,6 +168,33 @@ export default {
         clearTimeout(this.resumeTimer);
     },
     methods: {
+        go_vehicle_profile_messages(){
+            
+            var vehicle_owner_id = this.vehicle_detail.owner_details._id;
+            var current_user_id = this.store.user_data._id;
+            var vehicle_id = this.vehicle_detail._id;
+
+            if( !vehicle_owner_id || !current_user_id || !vehicle_id ) return;
+
+            this.$router.push({ name: 'vehicle-profile-messages', query:{ vehicle_owner_id: vehicle_owner_id, current_user_id: current_user_id, vehicle_id: vehicle_id }});
+        
+        },  
+        is_vehicle_owner_allow_message(){
+            var vehicle_owner_detail = this.vehicle_detail.owner_details;
+            if( 'allow_message' in vehicle_owner_detail ) return vehicle_owner_detail.allow_message;
+            else return false;
+        },
+        send_message_to_vehicle_owner(){
+            var vehicle_owner_id = this.vehicle_detail.owner_details._id;
+            var current_user_id = this.store.user_data._id;
+
+            if( !vehicle_owner_id || !current_user_id ) return;
+
+            this.$router.push({ name: 'send-message', query:{ vehicle_owner_id: vehicle_owner_id, current_user_id: current_user_id, vehicle_id: this.vehicle_detail._id }});
+        },
+        is_user_temporary(){
+            return this.store?.user_data?.temporary === true ? true : false;
+        },
         go_back() {
             if (window.history.length > 1) {
                 this.$router.back();
