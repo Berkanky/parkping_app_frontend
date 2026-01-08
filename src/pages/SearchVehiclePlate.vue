@@ -1,25 +1,48 @@
 <template>
-    <q-page class="pp-auth">
-        <div class="pp-topbar text-white">
-            <q-btn flat round icon="chevron_left" class="pp-back" @click="go_back" />
-            <q-avatar size="md" class="pp-logo">
-                <img src="../images/splash_screen_logo.svg" alt="">
-            </q-avatar>
-        </div>
-        <div class="pp-wrap">
+  <q-page class="pp-auth">
+    <div class="pp-topbar">
+      <q-btn flat round icon="chevron_left" class="pp-back text-white" @click="go_back" />
 
-            <div class="pp-mid">
-                <div class="pp-title">Vehicle Plate</div>
+     <!--  <div class="pp-brand">
+        <div class="pp-brand-glow"></div>
+        <q-avatar size="md" class="pp-logo">
+          <img src="../images/splash_screen_logo.svg" alt="">
+        </q-avatar>
+      </div> -->
+    </div>
 
-                <q-input v-model="plate" class="pp-input text-white" borderless placeholder="Ex. 34 ARG 76"
-                    input-class="pp-input-native" />
+    <div class="pp-wrap">
+      <div class="pp-mid">
+        <div class="pp-title">Search Vehicle Plate</div>
+        <div class="pp-subtitle">Enter the identifier to connect</div>
+
+        <q-input
+          v-model="plate"
+          class="pp-input"
+          borderless
+          placeholder="EX. 34 ARG 76"
+          input-class="pp-input-native"
+        >
+          <template v-slot:prepend>
+            <div class="pp-prepend">
+              <q-icon name="qr_code_scanner" size="20px" class="pp-prepend-ic" />
             </div>
+          </template>
+        </q-input>
+      </div>
 
-            <div class="pp-bottom">
-                <q-btn icon="search" unelevated no-caps class="pp-btn" label="Search" @click="on_search()" />
-            </div>
-        </div>
-    </q-page>
+      <div class="pp-bottom">
+        <q-btn
+          icon-right="search"
+          unelevated
+          no-caps
+          class="pp-btn"
+          label="Search"
+          @click="on_search()"
+        />
+      </div>
+    </div>
+  </q-page>
 </template>
 
 <script>
@@ -58,140 +81,174 @@ export default {
 </script>
 
 <style>
-.pp-auth {
-    background: #1c1c22;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    background-image: url("../images/BG-parkping.png");
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
+.pp-auth{
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  background:#1c1c22;
+  background-image:url("../images/BG-parkping-2.png");
+  background-size:cover;
+  background-position:center;
+  background-repeat:no-repeat;
 }
 
-.pp-topbar {
-    height: 64px;
-    display: flex;
-    align-items: center;
-    padding: 6px 10px 0 10px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-    position: relative;
+.pp-topbar{
+  height:74px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+  padding:0 12px;
 }
 
-.pp-wrap {
-    flex: 1 1 auto;
-    display: flex;
-    flex-direction: column;
-    padding: 28px 18px 22px;
+.pp-back{
+  position:absolute;
+  left:10px;
+  width:42px;
+  height:42px;
+  border-radius:14px;
+  opacity:.95;
 }
 
-.pp-mid {
-    flex: 1 1 auto;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 14px;
-    margin-top: 0;
+.pp-brand{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  position:relative;
+  transform:translateY(-2px);
 }
 
-.pp-back {
-    width: 40px;
-    height: 40px;
-    border-radius: 14px;
+.pp-brand-glow{
+  position:absolute;
+  left:10px;
+  top:50%;
+  width:26px;
+  height:26px;
+  border-radius:50%;
+  transform:translate(-50%,-50%);
+  background:rgba(0,255,163,.22);
+  filter:blur(6px);
 }
 
-.pp-title {
-    font-size: 20px;
-    font-weight: 700;
+.pp-logo{
+  width:100px;
+  height:34px;
+  border-radius:12px;
 }
 
-.pp-topbar-spacer {
-    width: 40px;
-    height: 40px;
+.pp-logo img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
 }
 
-.pp-logo {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    margin-top: 6px;
+.pp-brand-text{
+  color:#ffffff;
+  font-size:20px;
+  font-weight:700;
+  letter-spacing:.2px;
 }
 
-.pp-mark {
-    width: 28px;
-    height: 28px;
-    flex: 0 0 28px;
+.pp-wrap{
+  flex:1 1 auto;
+  display:flex;
+  flex-direction:column;
+  padding:26px 18px 22px;
 }
 
-.pp-brand {
-    color: #ffffff;
-    font-size: 22px;
-    font-weight: 700;
-    letter-spacing: .2px;
+.pp-mid{
+  flex:1 1 auto;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  gap:14px;
 }
 
-.pp-title {
-    color: #ffffff;
-    font-size: 22px;
-    font-weight: 700;
-    text-align: center;
+.pp-title{
+  color:#ffffff;
+  font-size:20px;
+  line-height:1.05;
+  font-weight:800;
+  letter-spacing:.2px;
+  text-shadow:0 8px 22px rgba(0,0,0,.45);
 }
 
-.pp-input {
-    width: min(92%, 440px);
-    background: #24242b;
-    border-radius: 12px;
-    padding: 6px 14px;
-    height: 56px;
-    display: flex;
-    align-items: center;
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .05);
+.pp-subtitle{
+  color:rgba(255,255,255,.55);
+  font-size:14px;
+  letter-spacing:.25px;
+  margin-top:-4px;
 }
 
-.pp-input .q-field__control,
-.pp-input .q-field__control-container {
-    height: 56px;
+.pp-input{
+  width:min(92%, 460px);
+  border-radius:18px;
+  padding:0 14px;
+  display:flex;
+  align-items:center;
+  background:rgba(36,36,43,.88);
+  box-shadow:
+    inset 0 0 0 1px rgba(255,255,255,.06),
+    0 14px 28px rgba(0,0,0,.22);
+  backdrop-filter: blur(6px);
 }
 
-.pp-input-native {
-    color: #ffffff !important;
-    font-size: 16px;
-    letter-spacing: .2px;
+.pp-prepend{
+  width:44px;
+  height:44px;
+  border-radius:14px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:rgba(0,0,0,.18);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.06);
 }
 
-.pp-input .q-field__native::placeholder {
-    color: rgba(255, 255, 255, .35);
+.pp-prepend-ic{
+  color:rgba(255,255,255,.55);
 }
 
-.pp-bottom {
-    display: flex;
-    justify-content: center;
-    padding-top: 14px;
+.pp-input-native{
+  color:#ffffff !important;
+  font-size:18px;
+  letter-spacing:2.2px;
+  text-transform:uppercase;
 }
 
-.pp-btn {
-    width: min(92%, 440px);
-    border-radius: 12px;
-    background: #ffffff;
-    color: #1c1c22;
-    font-size: 16px;
-    font-weight: 500;
+.pp-input .q-field__native::placeholder{
+  color:rgba(255,255,255,.22);
+  letter-spacing:2px;
 }
 
-.pp-logo {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    width: 104px;
-    height: 64px;
+.pp-bottom{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding-bottom: 14px;
 }
 
-.pp-logo img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
+.pp-btn{
+  width:min(92%, 460px);
+  border-radius:26px;
+  background:#fff;
+  color:#24242b;
+  font-size:18px;
+  letter-spacing:2px;
+  box-shadow:
+    0 18px 45px rgba(0,255,163,.22),
+    0 10px 26px rgba(0,0,0,.35);
+}
+
+.pp-btn .q-icon{
+  font-size:22px;
+}
+
+.pp-foot{
+  margin-top:4px;
+  font-size:12px;
+  letter-spacing:.6px;
+  color:rgba(255,255,255,.18);
 }
 </style>

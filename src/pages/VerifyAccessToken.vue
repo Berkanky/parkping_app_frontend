@@ -1,13 +1,13 @@
 <template>
     <q-page class="pp-search-page">
         <div class="pp-topbar">
-            <q-btn flat round icon="chevron_left" color="dark" class="pp-back-btn" @click="go_back" />
+            <q-btn flat round icon="chevron_left" class="pp-back-btn" @click="go_back" />
         </div>
 
         <div class="pp-container">
             <div class="qr-card">
                 <div class="qr-icon-wrap">
-                    <q-icon name="qr_code_scanner" size="50px" color="positive" />
+                    <q-icon name="qr_code_scanner" size="50px" color="white" />
                 </div>
 
                 <div class="qr-title">QR Code Scan</div>
@@ -33,7 +33,7 @@
                 <div class="pc-header">Public Code</div>
                 <div class="pc-subheader">Search by entering the vehicle's general code.</div>
 
-                <q-input v-model="public_code" rounded outlined bg-color="white" placeholder="EX. PPPP-SSSS"
+                <q-input v-model="public_code" rounded outlined placeholder="EX. PPPP-SSSS"
                     class="pc-input-field">
                     <template v-slot:prepend>
                         <q-icon name="tag" size="xs" color="grey-6" />
@@ -43,7 +43,7 @@
                 <q-btn unelevated rounded no-caps class="search-btn" @click="on_search">
                     <div class="row items-center justify-center full-width">
                         <span>Search</span>
-                        <q-icon name="search" size="xs" color="positive" class="q-ml-sm" />
+                        <q-icon name="search" size="xs" class="q-ml-sm" />
                     </div>
                 </q-btn>
             </div>
@@ -102,7 +102,7 @@ export default {
             try {
                 var res = await this.$api.post('/verify-access-token', { public_code: code });
                 if (res.status !== 200) return;
-                
+
                 this.$router.push({ name: 'search-vehicle-plate' });
                 return;
             } catch (err) {
@@ -186,25 +186,16 @@ export default {
 </script>
 
 <style scoped>
-.qr-reader-wrap {
-    margin-top: 18px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
+.pp-search-page {
+    background: #1c1c22;
+    min-height: 100vh;
+    padding: 10px;
 }
 
-#qr-reader {
-    width: 100%;
-    max-width: 420px;
-    border-radius: 22px;
-    overflow: hidden;
-    background: #fff;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.06);
-}
-
-.qr-cancel {
-    color: #718096;
+.pp-container {
+    padding: 15px;
+    max-width: 500px;
+    margin: 0 auto;
 }
 
 .pp-topbar {
@@ -220,50 +211,21 @@ export default {
     position: absolute;
     left: 10px;
     z-index: 10;
-}
-
-.pp-brand {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.pp-logo-img {
-    height: 32px;
-    width: auto;
-    object-fit: contain;
-}
-
-.pp-search-page {
-    background: linear-gradient(180deg, #f1f8f6 0%, #ffffff 100%);
-    min-height: 100vh;
-    padding: 10px;
-}
-
-.pp-brand-text {
-    font-size: 22px;
-    font-weight: 800;
-    color: #1a202c;
-    letter-spacing: -0.5px;
-}
-
-.pp-container {
-    padding: 15px;
-    max-width: 500px;
-    margin: 0 auto;
+    color: #ffffff;
 }
 
 .qr-card {
-    background: white;
+    background: #2a2a33;
     border-radius: 40px;
     padding: 40px 20px;
     text-align: center;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.35);
     margin-bottom: 40px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .qr-icon-wrap {
-    background: #f0fdf4;
+    background: rgba(34, 197, 94, 0.12);
     width: 90px;
     height: 90px;
     border-radius: 25px;
@@ -271,29 +233,54 @@ export default {
     align-items: center;
     justify-content: center;
     margin: 0 auto 25px;
+    border: 1px solid rgba(34, 197, 94, 0.18);
 }
 
 .qr-title {
     font-size: 24px;
-    font-weight: 700;
-    color: #1a202c;
+    font-weight: 800;
+    color: #ffffff;
     margin-bottom: 10px;
 }
 
 .qr-subtitle {
     font-size: 15px;
-    color: #718096;
+    color: #a0a3ad;
     line-height: 1.5;
     margin-bottom: 30px;
     padding: 0 30px;
 }
 
 .qr-btn {
-    color: #718096;
-    border-color: #edf2f7;
-    padding: 8px 35px;
+    color: #e7e8ee;
+    border-color: rgba(255, 255, 255, 0.10);
+    background: rgba(255, 255, 255, 0.02);
+    padding: 10px 35px;
     font-size: 13px;
-    font-weight: 600;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+.qr-reader-wrap {
+    margin-top: 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+#qr-reader {
+    width: 100%;
+    max-width: 420px;
+    border-radius: 22px;
+    overflow: hidden;
+    background: #0f1117;
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.40);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.qr-cancel {
+    color: #a0a3ad;
 }
 
 .pp-separator {
@@ -306,53 +293,76 @@ export default {
 .sep-line {
     flex: 1;
     height: 1px;
-    background: #e2e8f0;
+    background: rgba(255, 255, 255, 0.10);
 }
 
 .sep-text {
     font-size: 12px;
-    color: #cbd5e0;
-    font-weight: 600;
-    letter-spacing: 1px;
+    color: rgba(255, 255, 255, 0.35);
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+.public-section {
+    text-align: center;
 }
 
 .pc-header {
     font-size: 22px;
-    font-weight: 700;
-    color: #1a202c;
-    text-align: center;
-    margin-bottom: 5px;
+    font-weight: 800;
+    color: #ffffff;
+    margin-bottom: 6px;
 }
 
 .pc-subheader {
     font-size: 14px;
-    color: #718096;
-    text-align: center;
+    color: #a0a3ad;
     margin-bottom: 25px;
 }
 
 .pc-input-field {
     margin-bottom: 20px;
-    box-shadow: 0 10px 20px rgba(72, 187, 120, 0.08);
+    box-shadow: 0 16px 30px rgba(0, 0, 0, 0.25);
+}
+
+:deep(.q-field--outlined .q-field__control) {
+    border-radius: 22px !important;
+    height: 64px;
+    background: #24242b;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+:deep(.q-field--outlined .q-field__control:before) {
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+:deep(.q-field--outlined .q-field__control:after) {
+    border: 1px solid rgba(34, 197, 94, 0.35);
+}
+
+:deep(.q-field__native),
+:deep(.q-field__input) {
+    color: #ffffff;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+:deep(.q-field__native::placeholder),
+:deep(.q-field__input::placeholder) {
+    color: rgba(255, 255, 255, 0.28);
+    font-weight: 800;
+    letter-spacing: 3px;
 }
 
 .search-btn {
     width: 100%;
-    height: 60px;
-    background: #121826;
-    color: white;
+    height: 64px;
+    background: #2a2a33;
+    color: #ffffff;
     font-size: 18px;
-    font-weight: 600;
-    border-radius: 20px;
-}
-
-:deep(.q-field--outlined .q-field__control) {
-    border-radius: 20px !important;
-    height: 60px;
-    border: 2px solid transparent;
-}
-
-:deep(.q-field--outlined .q-field__control:before) {
-    border: 1px solid #e2e8f0;
+    font-weight: 800;
+    border-radius: 22px;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.08);
 }
 </style>
