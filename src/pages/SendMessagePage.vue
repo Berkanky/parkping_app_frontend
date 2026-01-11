@@ -170,9 +170,8 @@ export default {
         },
         async get_messages(vehicle_id) {
             var res = await this.$api.get("/vehicle-profile-messages/" + vehicle_id);
-            if (res.status !== 200) return;
-
-            this.vehicle_owner_detail = res.data?.vehicle_owner_detail || {};
+            if( res.status === 200 ) this.vehicle_owner_detail = res.data?.vehicle_owner_detail || {};
+            else this.vehicle_owner_detail = res?.response?.data?.vehicle_owner_detail || {};
         },
         get_message_picture_src(_id) {
             var backend_url = import.meta.env.VITE_BACKEND_URL;

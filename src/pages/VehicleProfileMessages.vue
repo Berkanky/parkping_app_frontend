@@ -103,10 +103,13 @@ export default {
         },
         async get_messages(vehicle_id) {
             var res = await this.$api.get("/vehicle-profile-messages/" + vehicle_id);
-            if (res.status !== 200) return;
-
-            this.conversation_messages = res.data?.conversation_messages || [];
-            this.vehicle_owner_detail = res.data?.vehicle_owner_detail || {};
+            if (res.status === 200) {
+                this.conversation_messages = res.data?.conversation_messages || [];
+                this.vehicle_owner_detail = res.data?.vehicle_owner_detail || {};
+            }else{
+                this.conversation_messages = [];
+                this.vehicle_owner_detail = res?.response?.data?.vehicle_owner_detail || {};
+            }
         },
         async delete_message(_id) {
             var res = await this.$api.put("/delete-message", { message_id: _id });
