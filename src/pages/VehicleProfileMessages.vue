@@ -14,7 +14,7 @@
                     <div class="mh-name">{{ vehicle_owner_detail?.full_name || '' }}</div>
 
                     <div class="mh-subrow">
-                        <div class="mh-plate">{{ vehicle_detail?.plate || '' }}</div>
+                        <div class="mh-plate">{{ vehicle_owner_detail?.plate || '' }}</div>
                     </div>
                 </div>
             </div>
@@ -75,8 +75,7 @@ export default {
             vehicle_owner_id: null,
             vehicle_id: null,
             conversation_messages: [],
-            vehicle_owner_detail: {},
-            vehicle_detail: {},
+            vehicle_owner_detail: {}
         };
     },
     async created() {
@@ -108,7 +107,6 @@ export default {
 
             this.conversation_messages = res.data?.conversation_messages || [];
             this.vehicle_owner_detail = res.data?.vehicle_owner_detail || {};
-            this.vehicle_detail = res.data?.vehicle_detail || {};
         },
         async delete_message(_id) {
             var res = await this.$api.put("/delete-message", { message_id: _id });

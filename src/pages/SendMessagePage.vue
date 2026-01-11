@@ -22,7 +22,7 @@
                 </div>
 
                 <div class="pp-name">{{ this.vehicle_owner_detail.full_name }}</div>
-                <div class="pp-code-pill">{{ this.vehicle_detail.plate }}</div>
+                <div class="pp-code-pill">{{ this.vehicle_owner_detail.plate }}</div>
             </div>
 
             <div class="pp-type-row">
@@ -96,8 +96,7 @@ export default {
             current_user_id: null,
             vehicle_owner_id: null,
             vehicle_id: null,
-            vehicle_owner_detail: {},
-            vehicle_detail: {}
+            vehicle_owner_detail: {}
         }
     },
     async created() {
@@ -174,7 +173,6 @@ export default {
             if (res.status !== 200) return;
 
             this.vehicle_owner_detail = res.data?.vehicle_owner_detail || {};
-            this.vehicle_detail = res.data?.vehicle_detail || {};
         },
         get_message_picture_src(_id) {
             var backend_url = import.meta.env.VITE_BACKEND_URL;
