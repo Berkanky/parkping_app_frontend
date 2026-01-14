@@ -54,7 +54,7 @@ export default {
       this.vehicles = this.vehicles.filter(function(item){ return item._id !== vehicle_id });
     },
     go_add_vehicle_page() {
-      this.$router.push({ name: 'add-vehicle', params: { user_id: this.store.user_data._id } });
+      this.$router.push({ name: 'add-vehicle', params: { user_id: this.store.user_data._id }, query:{ action_type: 'create' } });
     },
     get_selected_vehicle_id(_id) {
       var vehicle_id = _id;

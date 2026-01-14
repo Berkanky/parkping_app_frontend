@@ -10,7 +10,7 @@
                 <div class="pp-plate-head">
                     <div class="pp-section-title">Plate</div>
 
-                    <div v-if="plate_state === 'found'" class="pp-plate-chip pp-plate-chip-found">
+                    <!-- <div v-if="plate_state === 'found'" class="pp-plate-chip pp-plate-chip-found">
                         Existing vehicle loaded
                     </div>
                     <div v-else-if="plate_state === 'not_found'" class="pp-plate-chip pp-plate-chip-new">
@@ -18,10 +18,10 @@
                     </div>
                     <div v-else-if="plate_state === 'checking'" class="pp-plate-chip pp-plate-chip-checking">
                         Checking...
-                    </div>
+                    </div> -->
                 </div>
                 <div class="pp-field" style="margin-top:10px">
-                    <div class="pp-label">License Plate</div>
+                    <!-- <div class="pp-label">License Plate</div>
                     <q-input v-model="form.plate" outlined dense class="pp-input" placeholder="34ABC123"
                         :loading="plate_state === 'checking'" @update:model-value="on_plate_input"
                         @blur="on_plate_blur">
@@ -31,22 +31,39 @@
                     </q-input>
                     <div class="pp-help">
                         Type plate. If it exists, we load it and you update. If not, you create.
-                    </div>
+                    </div> -->
+
+                    <div class="pp-label">License Plate</div>
+                    <q-input 
+                        v-model="form.plate" 
+                        outlined dense class="pp-input" 
+                        placeholder="34ABC123"
+                    >
+                        <template v-slot:prepend>
+                            <q-icon name="badge" class="pp-input-icon" />
+                        </template>
+                    </q-input>
                 </div>
             </q-card>
             <q-card flat bordered class="pp-card"
-                v-if="plate_state === 'found' && (vehicle_existing_pictures || []).length">
+                v-if="(vehicle_existing_pictures || []).length">
                 <div class="pp-card-head">
                     <div class="pp-card-head-left">
-                        <div class="pp-card-title">Vehicle Photos</div>
+                        <div class="pp-card-title">Existing Vehicle Photos</div>
                     </div>
                 </div>
                 <div class="pp-photos-row">
                     <div v-for="i in vehicle_existing_pictures" :key="i._id" class="pp-photo-slot pp-photo-filled">
                         <q-img :src="get_vehicle_picture(i._id)" class="pp-photo-img" :ratio="1" fit="cover"
                             no-spinner />
-                        <q-btn round unelevated dense size="10px" icon="close" class="pp-photo-remove"
-                            @click.stop="delete_photo(i)" />
+                        <q-btn 
+                            v-if="!i.is_deleted"
+                            round unelevated dense size="10px" icon="close" class="pp-photo-remove"
+                            @click.stop="update_photo_status(i._id)" />
+
+                        <div class="absolute-center bg-dark flex flex-center" v-if="i.is_deleted">
+                            <q-btn icon="sync" flat size="sm" v-on:click="update_photo_status(i._id)"></q-btn>
+                        </div>
                     </div>
                 </div>
             </q-card>
@@ -131,13 +148,17 @@
         </div>
         <input ref="fileInput" type="file" accept="image/*" style="display:none" @change="on_file_change" />
         <div class="pp-bottom-bar">
-            <q-btn class="pp-save-btn bg-white text-dark" unelevated no-caps icon="check" label="Save Vehicle"
+            <q-btn 
+                :label="dynamic_label()"
+                :icon="dynamic_icon()"
+                class="pp-save-btn bg-white text-dark" unelevated no-caps
                 @click="save_vehicle" />
         </div>
     </q-page>
 </template>
 
 <script>
+import { tiSave } from '@quasar/extras/themify';
 import { UseStore } from '../stores/store';
 export default {
     setup() {
@@ -178,14 +199,40 @@ export default {
             plate_debounce_ms: 650,
             plate_timer: null,
             last_checked_plate: '',
-            vehicle_existing_pictures: []
+            vehicle_existing_pictures: [],
+            action_type: null
         };
     },
     async mounted() {
+        var { action_type, vehicle_id } = this.$route.query;
         var { user_id } = this.$route.params;
+
         this.current_user_id = user_id;
+        this.action_type = action_type;
+
+        if( action_type == 'update' ){
+            await this.get_existing_vehicle_data(vehicle_id);
+        }
     },
     methods: {
+        dynamic_icon(){
+            if( this.action_type == 'update' ) return 'update';
+            else if( this.action_type == 'create' ) return 'add';
+            else return 'check';
+        },
+        dynamic_label(){
+            if( this.action_type == 'update' ) return 'Save Vehicle';
+            else if( this.action_type == 'create' ) return 'Add Vehicle';
+            else return '-';
+        },
+        update_photo_status(_id){
+            var existing_picture = this.vehicle_existing_pictures.find(function(item){ return item._id === _id });
+            if( existing_picture ){
+                if( 'is_deleted' in existing_picture && existing_picture.is_deleted === true ) existing_picture.is_deleted = false;
+                else existing_picture.is_deleted = true;
+            }
+            else return;
+        },
         async delete_photo(i) {
             var file_id = i._id;
             var res = await this.$api.post('/delete-picture', { file_id: file_id });
@@ -245,9 +292,22 @@ export default {
                 this.plate_state = 'idle';
             }
         },
+        async get_existing_vehicle_data(vehicle_id){
+            try{   
+                var res = await this.$api.post('/vehicle-detail', { vehicle_id: vehicle_id });
+                if (res.status !== 200) this.$router.replace({ path: '/home' });
+
+                var existing_vehicle_detail = res.data.vehicle_detail;
+                console.log(existing_vehicle_detail);
+                this.apply_vehicle_to_form(existing_vehicle_detail);
+            }catch(err){
+                console.error(err);
+            }
+        },
         apply_vehicle_to_form(v) {
             this.editing_vehicle_id = v._id || null;
 
+            this.form.plate = v.plate || '';
             this.form.make = v.make || '';
             this.form.model = v.model || '';
             this.form.vehicle_type = v.vehicle_type || 'car';
@@ -359,11 +419,18 @@ export default {
             this.vehicle_pictures[idx] = null;
         },
         async save_vehicle() {
+
             var fd = new FormData();
+
             fd.append('plate', this.form.plate);
             fd.append('vehicle_type', this.form.vehicle_type);
             fd.append('make', this.form.make);
             fd.append('model', this.form.model);
+            fd.append('action_type', this.action_type);
+
+            var deleted_pictures = this.vehicle_existing_pictures.filter(function(item) { return item.is_deleted === true });
+            deleted_pictures = deleted_pictures.map(function(item){ return item._id });
+            if( deleted_pictures ) fd.append('deleted_pictures', JSON.stringify(deleted_pictures));
 
             for (var i = 0; i < this.vehicle_pictures.length; i++) {
                 if (this.vehicle_pictures[i]) fd.append('vehicle_pictures', this.vehicle_pictures[i]);
@@ -377,7 +444,6 @@ export default {
             this.form.color = final_color;
 
             var res = await this.$api.post('/add-vehicle', fd);
-            console.log("add_vehicle_service -> " + JSON.stringify(res));
             if (res.status !== 200) return;
 
             this.$router.push({ name: 'home' });

@@ -28,7 +28,7 @@
             <img :src="userAvatar" alt="avatar" />
           </q-avatar>
           <div class="pp-name">{{ fullName }}</div>
-          <div class="pp-email">{{ email }}</div>
+          <!-- <div class="pp-email">{{ email }}</div> -->
         </div>
         <div class="pp-divider"></div>
         <q-list class="pp-menu" padding>

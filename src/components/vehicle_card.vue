@@ -4,7 +4,11 @@
       <div class="pp-img-wrap">
         <q-img class="pp-img"
           :src="example_picture_id ? get_vehicle_example_picture() : 'https://images.unsplash.com/photo-1583121274602-3e2820c69888?q=80&w=1000&auto=format&fit=crop'"
-          fit="cover" no-spinner />
+          fit="cover" no-spinner>
+                <div class="absolute-center bg-transparent flex flex-center">
+                  <q-btn icon="edit" flat size="sm" v-on:click="edit_existing_vehicle(_id)"></q-btn>
+                </div>
+          </q-img>
         <div class="pp-trash">
           <q-btn round dense flat icon="delete_outline" class="pp-trash-btn" v-on:click="this.delete_vehicle(_id)" />
         </div>
@@ -54,6 +58,9 @@ export default {
     },
     delete_vehicle(_id) {
       this.$emit('deleted_vehicle_id', _id);
+    },
+    edit_existing_vehicle(_id){
+      this.$router.push({ name: 'add-vehicle', params: { user_id: this.store.user_data._id }, query:{ action_type: 'update', vehicle_id: _id } });
     }
   }
 }

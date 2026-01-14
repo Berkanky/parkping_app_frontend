@@ -94,15 +94,13 @@
                         </q-item-section>
                         <q-item-section>
                             <q-item-label class="vd-field-k">Phone Number</q-item-label>
-                            <q-item-label class="vd-field-v">{{
-                                this.vehicle_detail?.owner_details?.formatted_phone_number
-                                }}</q-item-label>
+                            <q-item-label class="vd-field-v">{{ this.vehicle_detail?.owner_details?.formatted_phone_number || 'No registered phone number found.' }}</q-item-label>
                         </q-item-section>
                         <q-item-section side>
                             <q-icon name="content_copy" class="vd-copy-ic" />
                         </q-item-section>
                     </q-item>
-                    <q-item class="vd-field vd-copy" clickable v-ripple
+                    <!-- <q-item class="vd-field vd-copy" clickable v-ripple
                         @click="copy_text(this.vehicle_detail.owner_details.email_address, 'Email copied')">
                         <q-item-section avatar>
                             <q-icon name="mail" class="vd-field-ic" />
@@ -115,7 +113,7 @@
                         <q-item-section side>
                             <q-icon name="content_copy" class="vd-copy-ic" />
                         </q-item-section>
-                    </q-item>
+                    </q-item> -->
                 </q-card>
             </div>
             <div class="vd-bottom">
