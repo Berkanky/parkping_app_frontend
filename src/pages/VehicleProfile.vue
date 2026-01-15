@@ -31,6 +31,10 @@
                 <div class="vd-plate-label">LICENSE PLATE</div>
                 <div class="vd-plate-value">{{ this.vehicle_detail.plate }}</div>
             </div>
+            <div class="vd-vehicle-status-notification" v-if="this.vehicle_detail.vehicle_status_notification">
+                <div class="vd-plate-label">Vehicle Status Notification</div>
+                <div class="vd-plate-value">{{ this.vehicle_detail.vehicle_status_notification }}</div>
+            </div>
             <q-banner class="vd-notice" rounded
                 v-on:click="go_vehicle_profile_messages()"
                 v-if="this.vehicle_detail?.conversation_messages && this.vehicle_detail.conversation_messages.length">
@@ -447,6 +451,28 @@ export default {
     overflow: hidden;
     border: 1px solid rgba(255, 255, 255, 0.08);
     box-shadow: 0 10px 22px rgba(0, 0, 0, 0.28);
+}
+
+.vd-vehicle-status-notification {
+    margin-top: 12px;
+    background: #4b4ba9;
+    border-radius: 14px;
+    padding: 12px 12px 12px 14px;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.28);
+}
+
+.vd-vehicle-status-notification:before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 12px;
+    bottom: 12px;
+    width: 4px;
+    border-radius: 6px;
+    background:  rgba(255, 255, 255, 0.55);
 }
 
 .vd-plate:before {

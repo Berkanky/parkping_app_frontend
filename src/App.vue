@@ -5,7 +5,6 @@
 </template>
 
 <script>
-import axios from 'axios';
 import { UseStore } from './stores/store';
 import { defineComponent } from 'vue';
 import { AddressbarColor } from 'quasar'
@@ -26,20 +25,18 @@ export default defineComponent({
 </script>
 
 <style>
+
 html,
 body,
 #app {
   -ms-overflow-style: none;
-  /* IE/Edge legacy */
   scrollbar-width: none;
-  /* Firefox */
 }
 
 html::-webkit-scrollbar,
 body::-webkit-scrollbar,
 #app::-webkit-scrollbar {
   width: 0 !important;
-  /* Chrome/Safari */
   height: 0 !important;
   display: none;
 }
@@ -49,7 +46,8 @@ body::-webkit-scrollbar,
   height: 0 !important;
 }
 
-* {
+*{
   scrollbar-width: none;
 }
+
 </style>

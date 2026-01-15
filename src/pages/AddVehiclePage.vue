@@ -9,44 +9,28 @@
             <q-card flat bordered class="pp-card pp-card-details">
                 <div class="pp-plate-head">
                     <div class="pp-section-title">Plate</div>
-
-                    <!-- <div v-if="plate_state === 'found'" class="pp-plate-chip pp-plate-chip-found">
-                        Existing vehicle loaded
-                    </div>
-                    <div v-else-if="plate_state === 'not_found'" class="pp-plate-chip pp-plate-chip-new">
-                        New vehicle
-                    </div>
-                    <div v-else-if="plate_state === 'checking'" class="pp-plate-chip pp-plate-chip-checking">
-                        Checking...
-                    </div> -->
                 </div>
                 <div class="pp-field" style="margin-top:10px">
-                    <!-- <div class="pp-label">License Plate</div>
-                    <q-input v-model="form.plate" outlined dense class="pp-input" placeholder="34ABC123"
-                        :loading="plate_state === 'checking'" @update:model-value="on_plate_input"
-                        @blur="on_plate_blur">
-                        <template v-slot:prepend>
-                            <q-icon name="badge" class="pp-input-icon" />
-                        </template>
-                    </q-input>
-                    <div class="pp-help">
-                        Type plate. If it exists, we load it and you update. If not, you create.
-                    </div> -->
-
-                    <div class="pp-label">License Plate</div>
-                    <q-input 
-                        v-model="form.plate" 
-                        outlined dense class="pp-input" 
-                        placeholder="34ABC123"
-                    >
+                    <q-input v-model="form.plate" outlined dense class="pp-input" placeholder="34ABC123">
                         <template v-slot:prepend>
                             <q-icon name="badge" class="pp-input-icon" />
                         </template>
                     </q-input>
                 </div>
             </q-card>
-            <q-card flat bordered class="pp-card"
-                v-if="(vehicle_existing_pictures || []).length">
+            <q-card flat bordered class="pp-card pp-card-details">
+                <div class="pp-plate-head">
+                    <div class="pp-section-title">Vehicle Status Notification</div>
+                </div>
+                <div class="pp-field" style="margin-top:10px">
+                    <q-input type="textarea" v-model="form.vehicle_status_notification" outlined dense class="pp-input" placeholder="vehicle status">
+                        <template v-slot:prepend>
+                            <q-icon name="info" class="pp-input-icon" />
+                        </template>
+                    </q-input>
+                </div>
+            </q-card>
+            <q-card flat bordered class="pp-card" v-if="(vehicle_existing_pictures || []).length">
                 <div class="pp-card-head">
                     <div class="pp-card-head-left">
                         <div class="pp-card-title">Existing Vehicle Photos</div>
@@ -56,10 +40,8 @@
                     <div v-for="i in vehicle_existing_pictures" :key="i._id" class="pp-photo-slot pp-photo-filled">
                         <q-img :src="get_vehicle_picture(i._id)" class="pp-photo-img" :ratio="1" fit="cover"
                             no-spinner />
-                        <q-btn 
-                            v-if="!i.is_deleted"
-                            round unelevated dense size="10px" icon="close" class="pp-photo-remove"
-                            @click.stop="update_photo_status(i._id)" />
+                        <q-btn v-if="!i.is_deleted" round unelevated dense size="10px" icon="close"
+                            class="pp-photo-remove" @click.stop="update_photo_status(i._id)" />
 
                         <div class="absolute-center bg-dark flex flex-center" v-if="i.is_deleted">
                             <q-btn icon="sync" flat size="sm" v-on:click="update_photo_status(i._id)"></q-btn>
@@ -148,11 +130,8 @@
         </div>
         <input ref="fileInput" type="file" accept="image/*" style="display:none" @change="on_file_change" />
         <div class="pp-bottom-bar">
-            <q-btn 
-                :label="dynamic_label()"
-                :icon="dynamic_icon()"
-                class="pp-save-btn bg-white text-dark" unelevated no-caps
-                @click="save_vehicle" />
+            <q-btn :label="dynamic_label()" :icon="dynamic_icon()" class="pp-save-btn bg-white text-dark" unelevated
+                no-caps @click="save_vehicle" />
         </div>
     </q-page>
 </template>
@@ -180,7 +159,8 @@ export default {
                 plate: '',
                 color_key: 'silver',
                 color_label: 'Silver',
-                color_custom: ''
+                color_custom: '',
+                vehicle_status_notification: ''
             },
             vehicle_pictures: [null, null, null],
             selected_slot: null,
@@ -210,25 +190,23 @@ export default {
         this.current_user_id = user_id;
         this.action_type = action_type;
 
-        if( action_type == 'update' ){
-            await this.get_existing_vehicle_data(vehicle_id);
-        }
+        if (action_type == 'update') await this.get_existing_vehicle_data(vehicle_id);
     },
     methods: {
-        dynamic_icon(){
-            if( this.action_type == 'update' ) return 'update';
-            else if( this.action_type == 'create' ) return 'add';
+        dynamic_icon() {
+            if (this.action_type == 'update') return 'update';
+            else if (this.action_type == 'create') return 'add';
             else return 'check';
         },
-        dynamic_label(){
-            if( this.action_type == 'update' ) return 'Save Vehicle';
-            else if( this.action_type == 'create' ) return 'Add Vehicle';
+        dynamic_label() {
+            if (this.action_type == 'update') return 'Save Vehicle';
+            else if (this.action_type == 'create') return 'Add Vehicle';
             else return '-';
         },
-        update_photo_status(_id){
-            var existing_picture = this.vehicle_existing_pictures.find(function(item){ return item._id === _id });
-            if( existing_picture ){
-                if( 'is_deleted' in existing_picture && existing_picture.is_deleted === true ) existing_picture.is_deleted = false;
+        update_photo_status(_id) {
+            var existing_picture = this.vehicle_existing_pictures.find(function (item) { return item._id === _id });
+            if (existing_picture) {
+                if ('is_deleted' in existing_picture && existing_picture.is_deleted === true) existing_picture.is_deleted = false;
                 else existing_picture.is_deleted = true;
             }
             else return;
@@ -292,15 +270,14 @@ export default {
                 this.plate_state = 'idle';
             }
         },
-        async get_existing_vehicle_data(vehicle_id){
-            try{   
+        async get_existing_vehicle_data(vehicle_id) {
+            try {
                 var res = await this.$api.post('/vehicle-detail', { vehicle_id: vehicle_id });
                 if (res.status !== 200) this.$router.replace({ path: '/home' });
 
                 var existing_vehicle_detail = res.data.vehicle_detail;
-                console.log(existing_vehicle_detail);
                 this.apply_vehicle_to_form(existing_vehicle_detail);
-            }catch(err){
+            } catch (err) {
                 console.error(err);
             }
         },
@@ -312,6 +289,7 @@ export default {
             this.form.model = v.model || '';
             this.form.vehicle_type = v.vehicle_type || 'car';
             this.form.color = v.color || null;
+            this.form.vehicle_status_notification = v.vehicle_status_notification || null;
 
             this.vehicle_existing_pictures = Array.isArray(v.vehicle_pictures) ? v.vehicle_pictures : [];
 
@@ -381,7 +359,7 @@ export default {
                 this.$refs.fileInput.click();
             }
         },
-        on_file_change(e) {
+        /* on_file_change(e) {
             var files = e.target.files;
             if (!files || !files.length) return;
 
@@ -410,6 +388,63 @@ export default {
             this.vehicle_pictures[slot] = file;
             this.photos[slot] = URL.createObjectURL(file);
             this.selected_slot = null;
+        }, */
+        on_file_change(e) {
+
+            var input = e.target;
+            var files = input.files;
+            if (!files || !files.length) return;
+
+            var file = files[0];
+            if (!file) return;
+
+            var name = (file.name || '').toLowerCase();
+            var ext = name.split('.').pop();
+
+            var looksLikeImage =
+                (file.type && file.type.startsWith('image/')) ||
+                ['jpg', 'jpeg', 'png', 'webp', 'heic', 'heif'].includes(ext);
+
+            if (!looksLikeImage) {
+                this.$q.notify({ type: 'negative', message: 'Only image files are allowed.' });
+                input.value = '';
+                return;
+            }
+
+            var maxMb = 6;
+            var maxBytes = maxMb * 1024 * 1024;
+            if (file.size > maxBytes) {
+                this.$q.notify({ type: 'negative', message: `Image is too large. Max ${maxMb}MB.` });
+                input.value = '';
+                return;
+            }
+
+            var slot = this.selected_slot;
+            if (slot === null || slot === undefined) {
+                input.value = '';
+                return;
+            }
+
+            if (this.photos[slot] && this.photos[slot].startsWith('blob:')) {
+                URL.revokeObjectURL(this.photos[slot]);
+            }
+
+            this.vehicle_pictures[slot] = file;
+
+            try {
+                const url = URL.createObjectURL(file);
+                this.photos[slot] = url;
+
+            } catch (err) {
+                var reader = new FileReader();
+                reader.onload = () => {
+                    this.photos[slot] = reader.result;
+                };
+                reader.readAsDataURL(file);
+            }
+
+            this.selected_slot = null;
+            input.value = '';
         },
         remove_photo(idx) {
             if (this.photos[idx] && typeof this.photos[idx] === 'string' && this.photos[idx].startsWith('blob:')) {
@@ -427,10 +462,11 @@ export default {
             fd.append('make', this.form.make);
             fd.append('model', this.form.model);
             fd.append('action_type', this.action_type);
+            fd.append('vehicle_status_notification', this.form.vehicle_status_notification);
 
-            var deleted_pictures = this.vehicle_existing_pictures.filter(function(item) { return item.is_deleted === true });
-            deleted_pictures = deleted_pictures.map(function(item){ return item._id });
-            if( deleted_pictures ) fd.append('deleted_pictures', JSON.stringify(deleted_pictures));
+            var deleted_pictures = this.vehicle_existing_pictures.filter(function (item) { return item.is_deleted === true });
+            deleted_pictures = deleted_pictures.map(function (item) { return item._id });
+            if (deleted_pictures) fd.append('deleted_pictures', JSON.stringify(deleted_pictures));
 
             for (var i = 0; i < this.vehicle_pictures.length; i++) {
                 if (this.vehicle_pictures[i]) fd.append('vehicle_pictures', this.vehicle_pictures[i]);
