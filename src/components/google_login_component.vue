@@ -1,14 +1,8 @@
 <template>
-  <q-btn
-    class="btn google-btn text-white"
-    unelevated
-    no-caps
-    :loading="loading"
-    @click="onGoogle"
-  >
+  <q-btn class="btn google-btn text-white" unelevated no-caps :loading="loading" @click="onGoogle">
     <div class="btn-inner">
       <span class="btn-icon">
-       <!--  <svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true">
+        <!--  <svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true">
           <path fill="#FFC107"
             d="M43.611 20.083H42V20H24v8h11.303C33.654 32.658 29.199 36 24 36c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.964 3.036l5.657-5.657C34.047 6.053 29.232 4 24 4 12.954 4 4 12.954 4 24s8.954 20 20 20 20-8.954 20-20c0-1.341-.138-2.65-.389-3.917z" />
           <path fill="#FF3D00"
@@ -27,12 +21,14 @@
 
 <script>
 import { UseStore } from '../stores/store';
+import { load_gsi } from 'boot/gsi';
+
 export default {
   name: "GoogleLoginComponent",
-  setup(){
+  setup() {
     var store = UseStore();
-    return{ store }
-  },  
+    return { store }
+  },
   data() {
     return {
       loading: false,
@@ -45,8 +41,13 @@ export default {
       return import.meta.env.VITE_PUBLIC_GOOGLE_CLIENT_ID;
     }
   },
-  mounted() {
-    this.initGoogleOnce();
+  async mounted() {
+    try {
+      await load_gsi();
+      this.initGoogleOnce();
+    } catch (e) {
+      console.log("GSI load failed", e);
+    }
   },
   methods: {
     initGoogleOnce() {
@@ -59,7 +60,7 @@ export default {
         callback: (resp) => this.handleCredentialResponse(resp),
         auto_select: false,
         cancel_on_tap_outside: true,
-        use_fedcm_for_prompt: true,
+        use_fedcm_for_prompt: false,
       });
 
       this.initialized = true;
@@ -67,21 +68,22 @@ export default {
 
     onGoogle() {
       if (!this.initialized) this.initGoogleOnce();
+      if (!this.initialized) return;
 
-      window.google.accounts.id.prompt((notification) => {
-        if (
-          notification.isNotDisplayed() ||
-          notification.isSkippedMoment()
-        ) return;
+      window.google.accounts.id.prompt((n) => {
+        if (n.isNotDisplayed()) console.log("GSI not displayed:", n.getNotDisplayedReason());
+        if (n.isSkippedMoment()) console.log("GSI skipped:", n.getSkippedReason());
+        if (n.isDismissedMoment()) console.log("GSI dismissed:", n.getDismissedReason());
       });
     },
 
     async google_verify_service(id_token) {
-      var response = await this.$api.post(
-        '/auth/google',
-        { id_token }
-      );
-      return response.status === 200;
+      try {
+        var response = await this.$api.post('/auth/google', { id_token });
+        return response.status === 200;
+      } catch (e) {
+        return false;
+      }
     },
 
     async handleCredentialResponse(response) {
@@ -92,7 +94,7 @@ export default {
 
       try {
         var ok = await this.google_verify_service(idToken);
-        if( !ok ) this.handleCredentialResponse(response);
+        if (!ok) throw new Error("Google verify failed");
 
         await this.store.get_user_details();
         this.$router.push({ name: "home" });
