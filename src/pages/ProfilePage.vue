@@ -208,7 +208,7 @@
         <q-btn v-show="this.is_address_add_avaliable()" rounded unelevated no-caps class="bg-white text-dark" style="border-radius:15px;"
           @click="on_add_address">
           <q-icon name="add" size="18px" style="margin-right:5px;"/>
-          <span>Add</span>
+          <span>Add New Address</span>
         </q-btn>
 
         <div class="pp-danger">

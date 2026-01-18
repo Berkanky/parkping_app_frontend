@@ -188,13 +188,15 @@ export default {
                 district: this.district || '',
                 city: this.city || '',
                 postal_code: this.postal_code || '',
-                country_code: this.country_code || '',
-                address_id: this.address_id || ''
+                country_code: this.country_code || ''
             };
+
+            if( this.address_id ) req_body.address_id = this.address_id;
 
             var res = await this.$api.post('/create-address', req_body);
             if (res.status !== 200) return;
 
+            await this.store.get_user_details();
             this.go_back();
         }
     }

@@ -9,9 +9,11 @@ var api = axios.create({
 
 api.interceptors.response.use(
   (res) => {
+    console.log(res);
     return res;
   },
   (err) => {
+    console.log(err);
     return err;
   }
 );
