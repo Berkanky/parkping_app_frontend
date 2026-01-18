@@ -1,393 +1,392 @@
 <template>
-    <q-page class="pp-page">
-        <div class="pp-shell">
+  <q-page class="pp-page">
+    <div class="pp-shell">
 
-            <div class="pp-header">
-                <q-btn round flat class="pp-head-btn" @click="go_back">
-                    <q-icon name="arrow_back" size="20px" />
-                </q-btn>
+      <div class="pp-header">
+        <q-btn round flat class="pp-head-btn" @click="go_back">
+          <q-icon name="arrow_back" size="20px" />
+        </q-btn>
+      </div>
+
+      <div class="pp-content">
+
+        <div class="pp-card pp-profile-card">
+          <div class="pp-avatar-wrap">
+            <div class="pp-avatar-ring">
+              <q-avatar size="112px" class="pp-avatar">
+                <img :src="user_details.profile_picture" />
+              </q-avatar>
             </div>
 
-            <div class="pp-content">
-
-                <div class="pp-card pp-profile-card">
-                    <div class="pp-avatar-wrap">
-                        <div class="pp-avatar-ring">
-                            <q-avatar size="112px" class="pp-avatar">
-                                <img :src="user_details.profile_picture" />
-                            </q-avatar>
-                        </div>
-
-                        <div class="pp-qr-badge">
-                            <q-icon name="qr_code_2" size="18px" color="dark" />
-                        </div>
-                    </div>
-
-                    <div class="pp-name">
-                        {{ ((user_details.name || '') + ' ' + (user_details.surname || '')).trim() }}
-                    </div>
-
-                    <div class="pp-contact">
-                        <div v-if="!user_details.hide_email_address" class="pp-contact-row">
-                            <q-icon name="mail" size="16px" class="pp-contact-ic" />
-                            <span class="pp-contact-txt">{{ user_details.email_address || '-' }}</span>
-                        </div>
-
-                        <div v-if="!user_details.hide_phone_number" class="pp-contact-row">
-                            <q-icon name="smartphone" size="16px" class="pp-contact-ic" />
-                            <span class="pp-contact-txt">{{ user_details.phone_number_encrypted || '-' }}</span>
-                        </div>
-                    </div>
-
-                    <div class="pp-stats">
-                        <div class="pp-stat">
-                            <div class="pp-stat-k">Register Date</div>
-                            <div class="pp-stat-v">{{ user_details.created_date || '-' }}</div>
-                        </div>
-
-                        <div class="pp-stat">
-                            <div class="pp-stat-k">Vehicles</div>
-                            <div class="pp-stat-v pp-green">{{ (user_details.vehicle_count ?? '-') }} Aktif</div>
-                        </div>
-
-                        <div class="pp-stat pp-stat-wide">
-                            <div class="pp-stat-k">Last Update</div>
-                            <div class="pp-stat-v">{{ user_details.updated_date || '-' }}</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="pp-card">
-                    <div class="pp-sec-head">
-                        <div class="pp-sec-ic">
-                            <q-icon name="edit_note" size="20px" class="pp-sec-ic-i" />
-                        </div>
-                        <div class="pp-sec-title">Update Profile</div>
-                    </div>
-
-                    <div class="pp-form">
-                        <div class="pp-field">
-                            <div class="pp-label">Name</div>
-                            <div class="pp-input-wrap">
-                                <q-input dense borderless v-model="form.name" class="pp-input"
-                                    input-class="pp-input-native" />
-                                <q-icon name="person" size="18px" class="pp-input-ic" />
-                            </div>
-                        </div>
-
-                        <div class="pp-field">
-                            <div class="pp-label">Surname</div>
-                            <div class="pp-input-wrap">
-                                <q-input dense borderless v-model="form.surname" class="pp-input"
-                                    input-class="pp-input-native" />
-                                <q-icon name="person" size="18px" class="pp-input-ic" />
-                            </div>
-                        </div>
-
-                        <div class="pp-field">
-                            <div class="pp-label">Phone</div>
-                            <div class="pp-input-wrap">
-                                <q-input dense borderless v-model="form.phone" class="pp-input"
-                                    input-class="pp-input-native" />
-                                <q-icon name="call" size="18px" class="pp-input-ic" />
-                            </div>
-                        </div>
-
-                        <div class="pp-field">
-                            <div class="pp-label">Dial Code</div>
-                            <div class="pp-input-wrap">
-                                <q-input dense borderless v-model="form.dial_code" class="pp-input"
-                                    input-class="pp-input-native" />
-                                <q-icon name="call" size="18px" class="pp-input-ic" />
-                            </div>
-                        </div>
-
-                        <div class="pp-field">
-                            <div class="pp-label">Email</div>
-                            <div class="pp-input-wrap">
-                                <q-input disable dense borderless v-model="form.email_address" class="pp-input"
-                                    input-class="pp-input-native" type="email" />
-                                <q-icon name="mail" size="18px" class="pp-input-ic" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="pp-card">
-                    <div class="pp-sec-head">
-                        <div class="pp-sec-ic">
-                            <q-icon name="lock" size="20px" class="pp-sec-ic-i" />
-                        </div>
-                        <div class="pp-sec-title">Privacy Settings</div>
-                    </div>
-
-                    <div class="pp-toggles">
-                        <div class="pp-toggle-row">
-                            <div class="pp-toggle-txt">
-                                <div class="pp-toggle-title">Hide Profile</div>
-                                <div class="pp-toggle-sub">Your profile does not appear in search results.</div>
-                            </div>
-                            <q-toggle v-model="toggles.hide_profile" color="ppgreen" keep-color class="pp-toggle" />
-                        </div>
-
-                        <div class="pp-divider"></div>
-
-                        <div class="pp-toggle-row">
-                            <div class="pp-toggle-txt">
-                                <div class="pp-toggle-title">Hide Phone</div>
-                                <div class="pp-toggle-sub">Your number cannot be seen by others.</div>
-                            </div>
-                            <q-toggle v-model="toggles.hide_phone_number" color="ppgreen" keep-color
-                                class="pp-toggle" />
-                        </div>
-
-                        <div class="pp-divider"></div>
-
-                        <div class="pp-toggle-row">
-                            <div class="pp-toggle-txt">
-                                <div class="pp-toggle-title">Allow Messages</div>
-                                <div class="pp-toggle-sub">Other users can reach you via QR or Public Code.</div>
-                            </div>
-                            <q-toggle v-model="toggles.allow_message" color="ppgreen" keep-color class="pp-toggle" />
-                        </div>
-                    </div>
-
-                </div>
-
-                <q-btn unelevated no-caps class="pp-save-btn" label="Save Changes" @click="on_save" />
-
-                <div class="pp-addr-head">
-                    <div class="pp-addr-title">My addresses</div>
-                    <q-btn rounded unelevated no-caps class="pp-addr-add" @click="on_add_address">
-                        <q-icon name="add" size="18px" class="pp-addr-add-ic" />
-                        <span>Add</span>
-                    </q-btn>
-                </div>
-
-                <div v-for="(addr, idx) in addresses_view" :key="idx" class="pp-card pp-addr-card">
-                    <div class="pp-addr-top">
-                        <div class="pp-addr-left">
-                            <div class="pp-addr-ic" :class="{ 'pp-addr-ic-muted': addr.iconMuted }">
-                                <q-icon :name="addr.icon" size="20px" />
-                            </div>
-                            <div class="pp-addr-meta">
-                                <div class="pp-addr-name" :class="{ 'pp-muted': addr.mutedTitle }">{{ addr.title }}
-                                </div>
-                                <div v-if="addr.badge" class="pp-addr-badge">{{ addr.badge }}</div>
-                            </div>
-                        </div>
-
-                        <q-btn round flat dense class="pp-more-btn" @click="go_edit_current_address(addr._id)">
-                            <q-icon name="edit" size="18px" />
-                        </q-btn>
-                    </div>
-
-                    <div class="pp-addr-body">
-                        <div class="pp-addr-line">
-                            <div class="pp-addr-pipe"></div>
-                            <div class="pp-addr-lines">
-                                <div class="pp-addr-l1">{{ addr.person }}</div>
-                                <div class="pp-addr-l2">{{ addr.phone }}</div>
-                                <div class="pp-addr-l3">{{ addr.city }}</div>
-                                <div class="pp-addr-l4">{{ addr.detail }}</div>
-                            </div>
-                        </div>
-
-                        <div v-if="addr.meta" class="pp-addr-foot">
-                            <span>{{ addr.meta.created }}</span>
-                            <span class="pp-dot"></span>
-                            <span>{{ addr.meta.updated }}</span>
-                        </div>
-                    </div>
-
-                    <div v-if="addr.decor" class="pp-addr-decor"></div>
-                </div>
-
-                <div class="pp-danger">
-                    <div class="pp-danger-head">
-                        <div class="pp-danger-ic">
-                            <q-icon name="warning" size="20px" />
-                        </div>
-                        <div class="pp-danger-title">Manage Account</div>
-                    </div>
-
-                    <div class="pp-danger-text">
-                        This action cannot be undone. To delete your account, enter the following field: <b>"DELETE
-                            ACCOUNT"</b> write.
-                    </div>
-
-                    <div class="pp-danger-actions">
-                        <q-input dense borderless v-model="delete_confirm" class="pp-danger-input"
-                            input-class="pp-danger-input-native" placeholder="Confirmation Code" />
-                        <q-btn unelevated no-caps class="pp-danger-btn" @click="on_delete_account">
-                            <q-icon name="delete_forever" size="20px" class="pp-danger-btn-ic" />
-                            <span>Permanently Delete Account</span>
-                        </q-btn>
-                    </div>
-                </div>
-
-                <div class="pp-bottom-spacer"></div>
+            <div class="pp-qr-badge">
+              <q-icon name="qr_code_2" size="18px" color="dark" />
             </div>
+          </div>
+
+          <div class="pp-name">
+            {{ ((user_details.name || '') + ' ' + (user_details.surname || '')).trim() }}
+          </div>
+
+          <div class="pp-contact">
+            <div v-if="!user_details.hide_email_address" class="pp-contact-row">
+              <q-icon name="mail" size="16px" class="pp-contact-ic" />
+              <span class="pp-contact-txt">{{ user_details.email_address || '-' }}</span>
+            </div>
+
+            <div v-if="!user_details.hide_phone_number" class="pp-contact-row">
+              <q-icon name="smartphone" size="16px" class="pp-contact-ic" />
+              <span class="pp-contact-txt">{{ user_details.phone_number_encrypted || '-' }}</span>
+            </div>
+          </div>
+
+          <div class="pp-stats">
+            <div class="pp-stat">
+              <div class="pp-stat-k">Register Date</div>
+              <div class="pp-stat-v">{{ user_details.created_date || '-' }}</div>
+            </div>
+
+            <div class="pp-stat">
+              <div class="pp-stat-k">Vehicles</div>
+              <div class="pp-stat-v">{{ (user_details.vehicle_count ?? '-') }}</div>
+            </div>
+
+            <div class="pp-stat pp-stat-wide">
+              <div class="pp-stat-k">Last Update</div>
+              <div class="pp-stat-v">{{ user_details.updated_date || '-' }}</div>
+            </div>
+          </div>
         </div>
-    </q-page>
+
+        <div class="pp-card">
+          <div class="pp-sec-head">
+            <div class="pp-sec-ic">
+              <q-icon name="edit_note" size="20px" class="pp-sec-ic-i" />
+            </div>
+            <div class="pp-sec-title">Update Profile</div>
+          </div>
+
+          <div class="pp-form">
+            <div class="pp-field">
+              <div class="pp-label">Name</div>
+              <div class="pp-input-wrap">
+                <q-input dense borderless v-model="form.name" class="pp-input" input-class="pp-input-native"
+                  :input-style="{ color: '#fff' }" />
+                <q-icon name="person" size="18px" class="pp-input-ic" />
+              </div>
+            </div>
+
+            <div class="pp-field">
+              <div class="pp-label">Surname</div>
+              <div class="pp-input-wrap">
+                <q-input dense borderless v-model="form.surname" class="pp-input" input-class="pp-input-native"
+                  :input-style="{ color: '#fff' }" />
+                <q-icon name="person" size="18px" class="pp-input-ic" />
+              </div>
+            </div>
+
+            <div class="pp-field">
+              <div class="pp-label">Phone</div>
+              <div class="pp-input-wrap">
+                <q-input dense borderless v-model="form.phone" class="pp-input" input-class="pp-input-native"
+                  :input-style="{ color: '#fff' }" />
+                <q-icon name="call" size="18px" class="pp-input-ic" />
+              </div>
+            </div>
+
+            <div class="pp-field">
+              <div class="pp-label">Dial Code</div>
+              <div class="pp-input-wrap">
+                <q-input dense borderless v-model="form.dial_code" class="pp-input" input-class="pp-input-native"
+                  :input-style="{ color: '#fff' }" />
+                <q-icon name="call" size="18px" class="pp-input-ic" />
+              </div>
+            </div>
+
+            <div class="pp-field">
+              <div class="pp-label">Email</div>
+              <div class="pp-input-wrap">
+                <q-input disable dense borderless v-model="form.email_address" class="pp-input"
+                  :input-style="{ color: '#fff' }" input-class="pp-input-native" type="email" />
+                <q-icon name="mail" size="18px" class="pp-input-ic" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="pp-card">
+          <div class="pp-sec-head">
+            <div class="pp-sec-ic">
+              <q-icon name="lock" size="20px" class="pp-sec-ic-i" />
+            </div>
+            <div class="pp-sec-title">Privacy Settings</div>
+          </div>
+
+          <div class="pp-toggles">
+            <div class="pp-toggle-row">
+              <div class="pp-toggle-txt">
+                <div class="pp-toggle-title">Hide Profile</div>
+                <div class="pp-toggle-sub">Your profile does not appear in search results.</div>
+              </div>
+              <q-toggle v-model="toggles.hide_profile" color="ppgreen" keep-color class="pp-toggle" />
+            </div>
+
+            <div class="pp-divider"></div>
+
+            <div class="pp-toggle-row">
+              <div class="pp-toggle-txt">
+                <div class="pp-toggle-title">Hide Phone</div>
+                <div class="pp-toggle-sub">Your number cannot be seen by others.</div>
+              </div>
+              <q-toggle v-model="toggles.hide_phone_number" color="ppgreen" keep-color class="pp-toggle" />
+            </div>
+
+            <div class="pp-divider"></div>
+
+            <div class="pp-toggle-row">
+              <div class="pp-toggle-txt">
+                <div class="pp-toggle-title">Allow Messages</div>
+                <div class="pp-toggle-sub">Other users can reach you via QR or Public Code.</div>
+              </div>
+              <q-toggle v-model="toggles.allow_message" color="ppgreen" keep-color class="pp-toggle" />
+            </div>
+          </div>
+
+        </div>
+
+        <q-btn unelevated no-caps class="bg-white text-dark" style="border-radius:15px;" @click="on_save">
+          <q-icon name="edit" size="18px" style="margin-right:5px;"/>
+          <span>Save</span>
+        </q-btn>
+
+        <div v-for="(addr, key) in this.user_details?.addresses" v-show="!this.is_address_deleted(addr)" :key="key"
+          v-on:click="select_address(addr._id)" class="pp-card pp-addr-card">
+          <div class="pp-addr-top">
+            <div class="pp-addr-left">
+              <div class="pp-addr-ic" :style="{ 'color': this.is_address_selected(addr) === true ? '#2eff7b' : '' }">
+                <q-icon :name="address_dynamic_icon(addr)" size="20px" />
+              </div>
+              <div class="pp-addr-meta">
+                <div class="pp-addr-name">{{ addr.label }}
+                </div>
+                <div class="pp-addr-badge">{{ this.is_address_selected(addr) ? 'Primary Address' : addr.type }}</div>
+              </div>
+            </div>
+
+            <div class="pp-addr-actions">
+              <q-btn round flat dense class="pp-more-btn" @click.stop="go_edit_current_address(addr._id)">
+                <q-icon name="edit" size="18px" />
+              </q-btn>
+
+              <q-btn round flat dense class="pp-del-btn" @click.stop="confirm_delete_address(addr._id)">
+                <q-icon name="delete_outline" size="18px" />
+              </q-btn>
+            </div>
+          </div>
+
+          <div class="pp-addr-body">
+            <div class="pp-addr-line">
+              <div class="pp-addr-pipe"></div>
+              <div class="pp-addr-lines">
+                <div class="pp-addr-l1">{{ addr.name_surname }}</div>
+                <div class="pp-addr-l2"> {{ this.user_details?.dial_code || '-' }} {{
+                  this.user_details?.phone_number_encrypted || '-' }}</div>
+                <div class="pp-addr-l3">{{ addr.city }}</div>
+                <div class="pp-addr-l4">{{ addr.line1 }} {{ addr.line2 }}</div>
+              </div>
+            </div>
+
+            <div class="pp-addr-foot">
+              <span>{{ addr.created_date }}</span>
+              <span class="pp-dot"></span>
+              <span>{{ addr.updated_date || '' }}</span>
+            </div>
+          </div>
+
+          <div v-if="addr.decor" class="pp-addr-decor"></div>
+        </div>
+
+        <q-btn v-show="this.is_address_add_avaliable()" rounded unelevated no-caps class="bg-white text-dark" style="border-radius:15px;"
+          @click="on_add_address">
+          <q-icon name="add" size="18px" style="margin-right:5px;"/>
+          <span>Add</span>
+        </q-btn>
+
+        <div class="pp-danger">
+          <div class="pp-danger-head">
+            <div class="pp-danger-ic">
+              <q-icon name="warning" size="20px" />
+            </div>
+            <div class="pp-danger-title">Manage Account</div>
+          </div>
+
+          <div class="pp-danger-text">
+            This action cannot be undone. To delete your account, enter the following field: <b>"DELETE
+              ACCOUNT"</b> write.
+          </div>
+
+          <div class="pp-danger-actions">
+            <q-input :input-style="{ color: '#fff' }" dense borderless v-model="confirm_label" class="pp-danger-input"
+              input-class="pp-danger-input-native" placeholder="Confirmation Code" />
+            <q-btn :disable="!this.deleted_account_confirmation_success()" unelevated no-caps class="pp-danger-btn"
+              @click="on_delete_account">
+              <q-icon name="delete_forever" size="20px" class="pp-danger-btn-ic" />
+              <span>Permanently Delete Account</span>
+            </q-btn>
+          </div>
+        </div>
+      </div>
+    </div>
+  </q-page>
 </template>
 
 <script>
 import { UseStore } from '../stores/store';
 
 export default {
-    setup() {
-        var store = UseStore();
-        return { store };
+  setup() {
+    var store = UseStore();
+    return { store };
+  },
+  data: function () {
+    return {
+      user_details: {},
+      form: {
+        name: '',
+        surname: '',
+        phone: '',
+        email_address: '',
+        dial_code: ''
+      },
+      toggles: {
+        hide_profile: false,
+        hide_phone_number: false,
+        allow_message: true
+      },
+      confirm_label: ''
+    };
+  },
+  methods: {
+    is_address_deleted(addr) {
+      return addr.is_deleted === true;
     },
-    data: function () {
-        return {
-            user_details: {},
-            form: {
-                name: '',
-                surname: '',
-                phone: '',
-                email_address: '',
-                dial_code: ''
-            },
-            toggles: {
-                hide_profile: false,
-                hide_phone_number: false,
-                allow_message: true
-            },
-            delete_confirm: ''
-        };
+    is_address_selected(addr) {
+      return addr.is_selected;
     },
-    computed: {
-        addresses_view: function () {
-            var addrs = (this.user_details && this.user_details.addresses) ? this.user_details.addresses : [];
-            if (!Array.isArray(addrs)) return [];
+    address_dynamic_icon(address) {
 
-            var phone = this.user_details ? (this.user_details.phone_number_encrypted || '-') : '-';
+      if (address.type === 'home') {
+        if (address.is_selected === true) return 'check';
+        else return 'home';
+      } else if (address.type === 'work') {
+        if (address.is_selected === true) return 'check';
+        else return 'work';
+      }
+    },
+    async select_address(address_id) {
+      var req_body = { address_id: address_id };
+      var res = await this.$api.put('/select-address/' + address_id, req_body);
+      if (res.status !== 200) return;
 
-            return addrs
-                .filter(function (a) { return a && a.is_deleted !== true; })
-                .map(function (a, i) {
-                    var t = (a.type || '').toString().toLowerCase();
-                    var l = (a.label || '').toString().toLowerCase();
+      var is_selected = res.data.is_selected;
+      var addresses_length = (this.user_details.addresses).length;
 
-                    var isHome = t === 'home' || l === 'home';
-                    var isWork = t === 'work' || l === 'work' || t === 'office' || l === 'office';
+      for (var i = 0; i < addresses_length; i++) {
 
-                    var icon = isHome ? 'home' : (isWork ? 'work' : 'location_on');
-
-                    var rawTitle = (a.label || a.type || 'address').toString();
-                    var title =
-                        rawTitle.toLowerCase() === 'home' ? 'Home Address' :
-                            rawTitle.toLowerCase() === 'work' ? 'Office' :
-                                rawTitle.toLowerCase() === 'office' ? 'Office' :
-                                    rawTitle.charAt(0).toUpperCase() + rawTitle.slice(1);
-
-                    var person = a.name_surname || '-';
-
-                    var cityLineParts = [];
-                    if (a.country_code) cityLineParts.push((a.country_code || '').toString().toUpperCase());
-                    if (a.city) cityLineParts.push(a.city);
-                    if (a.district) cityLineParts.push(a.district);
-                    if (a.state) cityLineParts.push(a.state);
-
-                    var cityLine = cityLineParts.join(', ') || '-';
-
-                    var detailParts = [];
-                    if (a.line1) detailParts.push(a.line1);
-                    if (a.line2) detailParts.push(a.line2);
-
-                    var postal = (a.postal_code === 0 || a.postal_code) ? String(a.postal_code) : '';
-                    if (postal) detailParts.push('(' + postal + ')');
-
-                    var detail = detailParts.join(' ') || '-';
-
-                    return {
-                        _id: a._id,
-                        decor: i === 0,
-                        icon: icon,
-                        iconMuted: !isHome,
-                        mutedTitle: !isHome,
-                        title: title,
-                        badge: isHome ? 'Primary Address' : '',
-                        person: person,
-                        phone: phone,
-                        city: cityLine,
-                        detail: detail,
-                        meta: {
-                            created: a.created_date || '-',
-                            updated: a.updated_date || '-'
-                        }
-                    };
-                });
+        var address_row = this.user_details.addresses[i];
+        if (address_row._id === address_id) address_row.is_selected = is_selected;
+        else {
+          if (is_selected === true) address_row.is_selected = false;
         }
+      };
     },
-    async mounted() {
-        //await this.store.get_user_details();
+    deleted_account_confirmation_success() {
+      return this.confirm_label == 'DELETE ACCOUNT';
     },
-    methods: {
-        go_back() {
-            if (window.history.length > 1) {
-                this.$router.back();
-            } else {
-                this.$router.replace({ name: 'home' });
-            }
-        },
-        async on_save() {
-            await this.update_profile_service();
-        },
-        on_add_address() {
-            this.$router.push({ name: 'add-address' });
-        },
-        go_edit_current_address(_id) {
+    is_address_add_avaliable() {
 
-            this.$router.push({ name: 'add-address', query:{ address_id: _id } });
-        },
-        on_delete_account() { },
-        async update_profile_service() {
+      var non_deleted_addresses = this.user_details?.addresses || [];
+      non_deleted_addresses = non_deleted_addresses.filter(function(item){ return item.is_deleted === false });
 
-            var req_body = {
-                name: this.form?.name || '',
-                surname: this.form?.surname || '',
-                dial_code: this.form?.dial_code || '',
-                phone_number: this.form?.phone || '',
-                hide_profile: this.toggles.hide_profile,
-                hide_phone_number: this.toggles.hide_phone_number,
-                allow_message: this.toggles.allow_message,
-            };
-
-            var res = await this.$api.post('/update-profile', req_body);
-            if (res.status !== 200) return;
-
-            await this.store.get_user_details();
-        }
+      if( !non_deleted_addresses.length ) return true;
+      return non_deleted_addresses.length == 2 ? false : true;
     },
-    watch: {
-        'store.user_data': {
-            handler(newVal) {
-                if (newVal) {
-                    this.user_details = newVal;
+    go_back() {
+      if (window.history.length > 1) {
+        this.$router.back();
+      } else {
+        this.$router.replace({ name: 'home' });
+      }
+    },
+    async on_save() {
+      await this.update_profile_service();
+    },
+    on_add_address() {
+      this.$router.push({ name: 'add-address' });
+    },
+    go_edit_current_address(_id) {
 
-                    this.form.name = newVal.name || '-';
-                    this.form.surname = newVal.surname || '-';
-                    this.form.phone = newVal.phone_number_encrypted || '-';
-                    this.form.dial_code = newVal.dial_code || '-';
-                    this.form.email_address = newVal.email_address || '-';
+      this.$router.push({ name: 'add-address', query: { address_id: _id } });
+    },
+    async confirm_delete_address(_id) {
+      var res = await this.$api.put('/delete-address/' + _id);
+      if (res.status !== 200) return;
 
-                    this.toggles.hide_profile = !!newVal.hide_profile;
-                    this.toggles.hide_phone_number = !!newVal.hide_phone_number;
-                    this.toggles.allow_message = !!newVal.allow_message;
-                }
-            },
-            immediate: true,
-            deep: true
-        }
+      var selected_address = this.user_details.addresses.find(function (item) { return item._id === _id });
+      if (selected_address) selected_address.is_deleted = true;
+    },
+    async on_delete_account() {
+
+      var req_body = { confirm_label: this.confirm_label };
+
+      var res = await this.$api.put('/delete-account', req_body);
+      if (res.status !== 200) return;
+
+      this.$router.replace({ name: 'login' });
+    },
+    async update_profile_service() {
+
+      var req_body = {
+        name: this.form?.name || '',
+        surname: this.form?.surname || '',
+        dial_code: this.form?.dial_code || '',
+        phone_number: this.form?.phone || '',
+        hide_profile: this.toggles.hide_profile,
+        hide_phone_number: this.toggles.hide_phone_number,
+        allow_message: this.toggles.allow_message,
+      };
+
+      var res = await this.$api.post('/update-profile', req_body);
+      if (res.status !== 200) return;
+
+      await this.store.get_user_details();
     }
+  },
+  watch: {
+    'store.user_data': {
+      handler(newVal) {
+        if (newVal) {
+          this.user_details = newVal;
+
+          this.form.name = newVal.name || '-';
+          this.form.surname = newVal.surname || '-';
+          this.form.phone = newVal.phone_number_encrypted || '-';
+          this.form.dial_code = newVal.dial_code || '-';
+          this.form.email_address = newVal.email_address || '-';
+
+          this.toggles.hide_profile = !!newVal.hide_profile;
+          this.toggles.hide_phone_number = !!newVal.hide_phone_number;
+          this.toggles.allow_message = !!newVal.allow_message;
+        }
+      },
+      immediate: true,
+      deep: true
+    }
+  }
 };
 </script>
 
 <style scoped>
-    .pp-page {
+.pp-page {
   background: #1c1c22;
   color: #fff;
 }
@@ -444,7 +443,6 @@ export default {
   box-shadow: 0 18px 40px rgba(0, 0, 0, 0.22);
 }
 
-/* Profile */
 .pp-profile-card {
   padding: 22px 18px 18px 18px;
   display: flex;
@@ -565,7 +563,6 @@ export default {
   color: #2eff7b;
 }
 
-/* Sections */
 .pp-sec-head {
   display: flex;
   align-items: center;
@@ -589,7 +586,6 @@ export default {
   font-weight: 800;
 }
 
-/* Form */
 .pp-form {
   display: flex;
   flex-direction: column;
@@ -637,17 +633,6 @@ export default {
   color: rgba(255, 255, 255, 0.45);
 }
 
-.pp-save-btn {
-  margin-top: 6px;
-  border-radius: 18px;
-  background: #2eff7b;
-  color: #0b1a10;
-  font-weight: 900;
-  padding: 14px 16px;
-  box-shadow: 0 0 26px rgba(46, 255, 123, 0.28);
-}
-
-/* Toggles */
 .pp-toggles {
   display: flex;
   flex-direction: column;
@@ -690,7 +675,6 @@ export default {
   box-shadow: none;
 }
 
-/* Addresses */
 .pp-addr-head {
   display: flex;
   align-items: center;
@@ -764,7 +748,6 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #2eff7b;
 }
 
 .pp-addr-ic-muted {
@@ -864,7 +847,6 @@ export default {
   background: rgba(255, 255, 255, 0.2);
 }
 
-/* Danger */
 .pp-danger {
   margin-top: 6px;
   border-radius: 24px;
@@ -944,8 +926,18 @@ export default {
   background: transparent;
 }
 
+.pp-addr-actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.pp-del-btn {
+  border-radius: 9999px;
+  color: rgba(255, 69, 58, 0.95);
+}
+
 :root {
   --q-color-ppgreen: #2eff7b;
 }
-
 </style>

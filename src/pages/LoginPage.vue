@@ -7,7 +7,9 @@
       <div class="panel">
         <div class="panel-inner">
           <div class="brand-row">
-            <img class="brand-full" src="../images/splash_screen_logo.svg" alt="ParkPing" />
+            <img     
+              loading="lazy"
+              class="brand-full" src="../images/splash_screen_logo.svg" alt="ParkPing" />
           </div>
 
           <div class="tagline">

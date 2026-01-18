@@ -11,7 +11,6 @@ export const UseStore = defineStore('UseStore', {
   }),
   actions: {
     async get_user_details() {
-
       var backend_url = import.meta.env.VITE_BACKEND_URL;
       var end_point = backend_url + '/user-details';
 
