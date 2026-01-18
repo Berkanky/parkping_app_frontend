@@ -323,7 +323,7 @@ export default {
         }
     },
     async mounted() {
-        await this.store.get_user_details();
+        //await this.store.get_user_details();
     },
     methods: {
         go_back() {

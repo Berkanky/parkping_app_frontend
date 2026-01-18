@@ -36,7 +36,7 @@ export default {
             return;
         }
 
-        await this.store.get_user_details();
+        //await this.store.get_user_details();
 
         this.$router.push({ name: 'home' });
         this.loading = false;

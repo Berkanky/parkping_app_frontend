@@ -96,7 +96,7 @@ export default {
         var ok = await this.google_verify_service(idToken);
         if (!ok) throw new Error("Google verify failed");
 
-        await this.store.get_user_details();
+        //await this.store.get_user_details();
         this.$router.push({ name: "home" });
       } catch (err) {
         console.log(err);

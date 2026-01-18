@@ -31,11 +31,25 @@
 <script>
 import guest_login_component from 'src/components/guest_login_component.vue';
 import google_login_component from 'src/components/google_login_component.vue';
+
+import { UseStore } from '../stores/store';
 export default {
   name: "LoginPage",
   components: {
     google_login_component,
     guest_login_component
+  },
+  setup(){
+    var store = UseStore();
+    return{ store }
+  },
+  data:function(){
+    return{
+
+    }
+  },
+  async beforeRouteLeave(to, from){
+    if( to?.name !== 'login' && to?.name !== 'welcome') await this.store.get_user_details();
   }
 };
 </script>
