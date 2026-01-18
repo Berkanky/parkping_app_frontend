@@ -1,19 +1,15 @@
 <template>
   <q-card class="pp-vehicle-card" flat>
-    <div class="pp-row">
+    <div class="pp-row"  @click="go_detail(_id)">
       <div class="pp-img-wrap">
         <q-img class="pp-img"
           :src="example_picture_id ? get_vehicle_example_picture() : 'https://images.unsplash.com/photo-1583121274602-3e2820c69888?q=80&w=1000&auto=format&fit=crop'"
           fit="cover" no-spinner>
-                <div class="absolute-center bg-transparent flex flex-center">
-                  <q-btn icon="edit" flat size="sm" v-on:click="edit_existing_vehicle(_id)"></q-btn>
-                </div>
-          </q-img>
+        </q-img>
         <div class="pp-trash">
-          <q-btn round dense flat icon="delete_outline" class="pp-trash-btn" v-on:click="this.delete_vehicle(_id)" />
+          <q-btn round dense flat icon="delete_outline" size="sm" class="pp-trash-btn" v-on:click.stop="this.delete_vehicle(_id)" />
         </div>
       </div>
-
       <div class="pp-content">
         <div class="pp-make">{{ make }}</div>
         <div class="pp-model">{{ model }}</div>
@@ -22,10 +18,9 @@
           {{ plate }} <span class="pp-divider">|</span> {{ color }}
         </div>
       </div>
-
       <div class="pp-side">
-        <q-btn flat round dense icon="chevron_right" color="white" size="20px" class="pp-side-btn"
-          @click="this.go_detail(_id)" />
+        <q-btn flat round dense icon="edit" color="white" size="sm" class="pp-side-btn"
+          @click.stop="edit_existing_vehicle(_id)" />
       </div>
     </div>
   </q-card>

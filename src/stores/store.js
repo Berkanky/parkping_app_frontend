@@ -3,8 +3,10 @@ import axios from 'axios';
 
 export const UseStore = defineStore('UseStore', {
   state: () => ({
-    app_version: "1.0.7",
+    app_version: "1.1.0",
     app_name:"parkping",
+    app_domain: "app.parkping.app",
+    
     user_data: {}
   }),
   actions: {

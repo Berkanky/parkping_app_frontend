@@ -42,7 +42,7 @@
             </q-item-section>
           </q-item>
           <q-item clickable v-ripple :active="isActive('/profile')" active-class="pp-active" class="pp-item"
-            @click="go('/profile')">
+            @click="go_profile_page()">
             <q-item-section avatar class="pp-icon">
               <q-icon name="person" />
             </q-item-section>
@@ -123,7 +123,7 @@ export default {
       return active_path_name_list.some(function (item) { return item == route_name });
     },
     go_profile_page() {
-      this.$router.push({ name: 'profile', params: { user_id: this.store.user_data._id } })
+      this.$router.push({ name: 'profile' })
     },
     dynamic_header_title() {
       var current_route_name = this.$route.name;

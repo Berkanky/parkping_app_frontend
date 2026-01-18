@@ -92,11 +92,9 @@ export default {
 
       try {
         var ok = await this.google_verify_service(idToken);
-
-        if (!ok) return;
+        if( !ok ) this.handleCredentialResponse(response);
 
         await this.store.get_user_details();
-
         this.$router.push({ name: "home" });
       } catch (err) {
         console.log(err);
