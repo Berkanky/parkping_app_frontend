@@ -2,16 +2,6 @@
   <q-btn class="btn google-btn text-white" unelevated no-caps :loading="loading" @click="onGoogle">
     <div class="btn-inner">
       <span class="btn-icon">
-        <!--  <svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true">
-          <path fill="#FFC107"
-            d="M43.611 20.083H42V20H24v8h11.303C33.654 32.658 29.199 36 24 36c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.964 3.036l5.657-5.657C34.047 6.053 29.232 4 24 4 12.954 4 4 12.954 4 24s8.954 20 20 20 20-8.954 20-20c0-1.341-.138-2.65-.389-3.917z" />
-          <path fill="#FF3D00"
-            d="M6.306 14.691l6.571 4.819C14.655 16.108 18.99 12 24 12c3.059 0 5.842 1.154 7.964 3.036l5.657-5.657C34.047 6.053 29.232 4 24 4c-7.682 0-14.36 4.33-17.694 10.691z" />
-          <path fill="#4CAF50"
-            d="M24 44c5.132 0 9.86-1.967 13.409-5.159l-6.19-5.238C29.19 35.091 26.715 36 24 36c-5.178 0-9.623-3.314-11.287-7.946l-6.52 5.023C9.475 39.556 16.227 44 24 44z" />
-          <path fill="#1976D2"
-            d="M43.611 20.083H42V20H24v8h11.303a12.04 12.04 0 0 1-4.084 5.603l6.19 5.238C36.967 39.268 44 34 44 24c0-1.341-.138-2.65-.389-3.917z" />
-        </svg> -->
         <q-icon name="fa-brands fa-google" size="xs"></q-icon>
       </span>
       <span class="btn-text">Continue with Google</span>
@@ -42,18 +32,25 @@ export default {
     }
   },
   async mounted() {
-    try {
-      await load_gsi();
-      this.initGoogleOnce();
-    } catch (e) {
-      console.log("GSI load failed", e);
-    }
+    await this.initGoogleOnce();
   },
   methods: {
-    initGoogleOnce() {
-      if (this.initialized) return;
-      if (!window.google?.accounts?.id) return;
-      if (!this.GOOGLE_CLIENT_ID) return;
+    async ensureGsiReady() {
+      if (window.google?.accounts?.id) return true;
+      try {
+        await load_gsi();
+        return !!window.google?.accounts?.id;
+      } catch (e) {
+        console.log("GSI load failed", e);
+        return false;
+      }
+    },
+    async initGoogleOnce() {
+      if (this.initialized) return true;
+
+      var ok = await this.ensureGsiReady();
+      if (!ok) return false;
+      if (!this.GOOGLE_CLIENT_ID) return false;
 
       window.google.accounts.id.initialize({
         client_id: this.GOOGLE_CLIENT_ID,
@@ -64,19 +61,23 @@ export default {
       });
 
       this.initialized = true;
+      return true;
     },
+    async onGoogle() {
+      this.loading = true;
+      try {
+        var ok = await this.initGoogleOnce();
+        if (!ok) return;
 
-    onGoogle() {
-      if (!this.initialized) this.initGoogleOnce();
-      if (!this.initialized) return;
-
-      window.google.accounts.id.prompt((n) => {
-        if (n.isNotDisplayed()) console.log("GSI not displayed:", n.getNotDisplayedReason());
-        if (n.isSkippedMoment()) console.log("GSI skipped:", n.getSkippedReason());
-        if (n.isDismissedMoment()) console.log("GSI dismissed:", n.getDismissedReason());
-      });
+        window.google.accounts.id.prompt((n) => {
+          if (n.isNotDisplayed()) console.log("GSI not displayed:", n.getNotDisplayedReason());
+          if (n.isSkippedMoment()) console.log("GSI skipped:", n.getSkippedReason());
+          if (n.isDismissedMoment()) console.log("GSI dismissed:", n.getDismissedReason());
+        });
+      } finally {
+        this.loading = false;
+      }
     },
-
     async google_verify_service(id_token) {
       try {
         var response = await this.$api.post('/auth/google', { id_token });
@@ -85,7 +86,6 @@ export default {
         return false;
       }
     },
-
     async handleCredentialResponse(response) {
       var idToken = response?.credential;
       if (!idToken) return;
@@ -96,7 +96,6 @@ export default {
         var ok = await this.google_verify_service(idToken);
         if (!ok) throw new Error("Google verify failed");
 
-        //await this.store.get_user_details();
         this.$router.push({ name: "home" });
       } catch (err) {
         console.log(err);
