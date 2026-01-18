@@ -41,7 +41,7 @@ export default {
         await load_gsi();
         return !!window.google?.accounts?.id;
       } catch (e) {
-        console.log("GSI load failed", e);
+        console.error("GSI load failed", e);
         return false;
       }
     },
@@ -70,9 +70,9 @@ export default {
         if (!ok) return;
 
         window.google.accounts.id.prompt((n) => {
-          if (n.isNotDisplayed()) console.log("GSI not displayed:", n.getNotDisplayedReason());
-          if (n.isSkippedMoment()) console.log("GSI skipped:", n.getSkippedReason());
-          if (n.isDismissedMoment()) console.log("GSI dismissed:", n.getDismissedReason());
+          if (n.isNotDisplayed()) console.error("GSI not displayed:", n.getNotDisplayedReason());
+          if (n.isSkippedMoment()) console.error("GSI skipped:", n.getSkippedReason());
+          if (n.isDismissedMoment()) console.error("GSI dismissed:", n.getDismissedReason());
         });
       } finally {
         this.loading = false;
@@ -98,7 +98,7 @@ export default {
 
         this.$router.push({ name: "home" });
       } catch (err) {
-        console.log(err);
+        console.error(err);
       } finally {
         this.loading = false;
       }

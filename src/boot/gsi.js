@@ -23,6 +23,6 @@ export default async () => {
   try {
     await load_gsi();
   } catch (e) {
-    console.log('GSI script load failed', e);
+    console.error('GSI script load failed', e);
   }
 };

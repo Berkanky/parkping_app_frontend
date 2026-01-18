@@ -144,17 +144,6 @@ export default {
     },
     data: function () {
         return {
-            loading: false,
-            error: "",
-            socket: null,
-            isManualClose: false,
-            reconnectAttempts: 0,
-            reconnectTimer: null,
-            heartbeatTimer: null,
-            sendQueue: [],
-            debounceTimer: null,
-            showResume: false,
-            resumeTimer: null,
             conversation_message: '',
             vehicle_id: null,
             vehicle_detail: {}
@@ -163,11 +152,6 @@ export default {
     async created() {
         var { vehicle_id } = this.$route.params;
         await this.get_vehicle_detail(vehicle_id);
-        this.ws_connect();
-    },
-    beforeUnmount() {
-        this.clean_up_ws(true);
-        clearTimeout(this.resumeTimer);
     },
     methods: {
         go_vehicle_profile_messages(){
@@ -206,94 +190,10 @@ export default {
         },
         async get_vehicle_detail(vehicle_id) {
             var res = await this.$api.post('/vehicle-detail', { vehicle_id: vehicle_id });
-            console.log("vehicle_detail_service -> " + JSON.stringify(res));
             if (res.status !== 200) this.$router.replace({ path: '/home' });
 
             this.vehicle_detail = res.data.vehicle_detail;
             this.vehicle_id = this.vehicle_detail._id;
-
-            console.log(JSON.stringify(this.vehicle_detail));
-        },
-        watch_user_message() {
-            if (!this.conversation_message) return;
-
-            clearTimeout(this.debounceTimer);
-            this.debounceTimer = setTimeout(() => {
-                var vehicle_id = this.vehicle_id;
-                this.send_data_to_ws({ conversation_message: this.conversation_message, vehicle_id: vehicle_id });
-            }, 300);
-        },
-        ws_connect() {
-            var web_socket_api_url = import.meta.env.VITE_WEB_SOCKET_API_URL;
-            try {
-                this.socket = new WebSocket(web_socket_api_url);
-                console.log(this.socket)
-            } catch (e) {
-                console.error("Web Socket Error. ", e);
-                return this.schedule_reconnect();
-            }
-
-            this.socket.onopen = () => {
-                this.reconnectAttempts = 0;
-                this.flush_queue();
-                this.start_heart_beat();
-                if (this.conversation_message) {
-                    var vehicle_id = this.vehicle_id;
-                    this.send_data_to_ws({ conversation_message: this.conversation_message, vehicle_id: vehicle_id });
-                }
-            };
-
-            this.socket.onmessage = (event) => {
-                try {
-                    var payload = JSON.parse(event.data);
-                    console.log("data from backend -> " + JSON.stringify(payload));
-                } catch (err) {
-                    console.log(err);
-                }
-            };
-
-            this.socket.onerror = (err) => console.warn("Web Socket Error. ", err?.message || err);
-            this.socket.onclose = () => {
-                this.stop_heart_beat();
-                if (!this.isManualClose) this.schedule_reconnect();
-            };
-        },
-        send_data_to_ws(payload) {
-            var data = JSON.stringify(payload);
-            if (this.socket && this.socket.readyState === WebSocket.OPEN) this.socket.send(data);
-            else this.sendQueue.push(data);
-        },
-        flush_queue() {
-            while (this.sendQueue.length && this.socket?.readyState === WebSocket.OPEN) {
-                this.socket.send(this.sendQueue.shift());
-            }
-        },
-        schedule_reconnect() {
-            var delay = Math.min(1000 * Math.pow(2, this.reconnectAttempts++), 15000);
-            clearTimeout(this.reconnectTimer);
-            this.reconnectTimer = setTimeout(() => this.ws_connect(), delay);
-        },
-        start_heart_beat() {
-            this.stop_heart_beat();
-            this.heartbeatTimer = setInterval(() => {
-                if (this.socket?.readyState === WebSocket.OPEN)
-                    this.socket.send(JSON.stringify({ type: "ping", t: Date.now() }));
-            }, 25_000);
-        },
-        stop_heart_beat() {
-            clearInterval(this.heartbeatTimer);
-            this.heartbeatTimer = null;
-        },
-        clean_up_ws(manual = false) {
-            this.isManualClose = manual;
-            clearTimeout(this.reconnectTimer);
-            this.stop_heart_beat();
-
-            if (this.socket && this.socket.readyState !== WebSocket.CLOSED) {
-                try { this.socket.close(1000, "client closing"); }
-                catch (err) { console.log(err) }
-            }
-            this.socket = null;
         },
         get_vehicle_picture(file_id) {
             var backend_url = import.meta.env.VITE_BACKEND_URL;

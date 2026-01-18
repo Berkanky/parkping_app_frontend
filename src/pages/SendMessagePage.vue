@@ -67,8 +67,6 @@
         </div>
 
         <div class="pp-bottom">
-            <!-- <q-btn unelevated no-caps class="pp-photo-btn" icon="photo_camera" label="Photo"
-                @click="upload_picture()" /> -->
             <q-btn unelevated no-caps class="pp-send-btn" label="Send Message" @click="send_message()">
                 <q-icon name="send" size="20px" class="pp-send-btn-ic" />
             </q-btn>

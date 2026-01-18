@@ -75,10 +75,22 @@ export default {
             vehicle_owner_id: null,
             vehicle_id: null,
             conversation_messages: [],
-            vehicle_owner_detail: {}
+            vehicle_owner_detail: {},
+
+            //Web Socket
+            socket: null,
+            isManualClose: false,
+            reconnectAttempts: 0,
+            reconnectTimer: null,
+            heartbeatTimer: null,
+            sendQueue: [],
+            debounceTimer: null,
+            showResume: false,
+            resumeTimer: null,
         };
     },
     async created() {
+
         var { current_user_id, vehicle_owner_id, vehicle_id } = this.$route.query;
 
         this.current_user_id = current_user_id;
@@ -86,6 +98,12 @@ export default {
         this.vehicle_id = vehicle_id;
 
         await this.get_messages(vehicle_id);
+
+        this.ws_connect();
+    },
+    beforeUnmount() {
+        this.clean_up_ws(true);
+        clearTimeout(this.resumeTimer);
     },
     mounted() {
         this.$nextTick(() => this.scroll_to_bottom());
@@ -131,6 +149,85 @@ export default {
             if (!el) return;
             el.scrollTop = el.scrollHeight;
         },
+        watch_user_message() {
+
+            clearTimeout(this.debounceTimer);
+            this.debounceTimer = setTimeout(() => {
+                var vehicle_id = this.vehicle_id;
+                this.send_data_to_ws({ vehicle_id: vehicle_id });
+            }, 300);
+        },
+        ws_connect() {
+            var web_socket_api_url = import.meta.env.VITE_WEB_SOCKET_API_URL;
+            try {
+                this.socket = new WebSocket(web_socket_api_url);
+            } catch (e) {
+                console.error("Web Socket Error. ", e);
+                return this.schedule_reconnect();
+            }
+
+            this.socket.onopen = () => {
+                this.reconnectAttempts = 0;
+                this.flush_queue();
+                this.start_heart_beat();
+
+                this.send_data_to_ws({ vehicle_id: this.vehicle_id, type: "subscribe" });
+            };
+
+            this.socket.onmessage = (event) => {
+                try {
+                    var payload = JSON.parse(event.data);
+
+                    var is_inserted = this.conversation_messages.find(function(item){ return item._id === payload._id});
+                    if( !is_inserted && payload?.conversation_id ) this.conversation_messages.push(payload);
+                } catch (err) {
+                    console.error(err);
+                }
+            };
+
+            this.socket.onerror = (err) => console.warn("Web Socket Error. ", err?.message || err);
+            this.socket.onclose = () => {
+                this.stop_heart_beat();
+                if (!this.isManualClose) this.schedule_reconnect();
+            };
+        },
+        send_data_to_ws(payload) {
+            var data = JSON.stringify(payload);
+            if (this.socket && this.socket.readyState === WebSocket.OPEN) this.socket.send(data);
+            else this.sendQueue.push(data);
+        },
+        flush_queue() {
+            while (this.sendQueue.length && this.socket?.readyState === WebSocket.OPEN) {
+                this.socket.send(this.sendQueue.shift());
+            }
+        },
+        schedule_reconnect() {
+            var delay = Math.min(1000 * Math.pow(2, this.reconnectAttempts++), 15000);
+            clearTimeout(this.reconnectTimer);
+            this.reconnectTimer = setTimeout(() => this.ws_connect(), delay);
+        },
+        start_heart_beat() {
+            this.stop_heart_beat();
+            this.heartbeatTimer = setInterval(() => {
+                if (this.socket?.readyState === WebSocket.OPEN)
+                    this.socket.send(JSON.stringify({ type: "ping", t: Date.now() }));
+            }, 25_000);
+        },
+        stop_heart_beat() {
+            clearInterval(this.heartbeatTimer);
+            this.heartbeatTimer = null;
+        },
+        clean_up_ws(manual = false) {
+            this.isManualClose = manual;
+            clearTimeout(this.reconnectTimer);
+            this.stop_heart_beat();
+
+            if (this.socket && this.socket.readyState !== WebSocket.CLOSED) {
+                try { this.socket.close(1000, "client closing"); }
+                catch (err) { console.error(err) }
+            }
+            this.socket = null;
+        }
     },
 };
 </script>
