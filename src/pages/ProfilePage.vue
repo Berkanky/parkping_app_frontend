@@ -35,7 +35,7 @@
 
             <div v-if="!user_details.hide_phone_number" class="pp-contact-row">
               <q-icon name="smartphone" size="16px" class="pp-contact-ic" />
-              <span class="pp-contact-txt">{{ user_details.dial_code || '' }} {{ user_details.phone_number_encrypted || '' }}</span>
+              <span class="pp-contact-txt">{{ this.user_details.formatted_phone_number || '-' }}</span>
             </div>
           </div>
 
