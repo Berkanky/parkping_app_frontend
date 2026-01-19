@@ -35,7 +35,7 @@
 
             <div v-if="!user_details.hide_phone_number" class="pp-contact-row">
               <q-icon name="smartphone" size="16px" class="pp-contact-ic" />
-              <span class="pp-contact-txt">{{ user_details.phone_number_encrypted || '-' }}</span>
+              <span class="pp-contact-txt">{{ user_details.dial_code || '' }} {{ user_details.phone_number_encrypted || '' }}</span>
             </div>
           </div>
 
@@ -188,8 +188,7 @@
               <div class="pp-addr-pipe"></div>
               <div class="pp-addr-lines">
                 <div class="pp-addr-l1">{{ addr.name_surname }}</div>
-                <div class="pp-addr-l2"> {{ this.user_details?.dial_code || '-' }} {{
-                  this.user_details?.phone_number_encrypted || '-' }}</div>
+                <div class="pp-addr-l2">{{ this.user_details.formatted_phone_number || '-' }}</div>
                 <div class="pp-addr-l3">{{ addr.city }}</div>
                 <div class="pp-addr-l4">{{ addr.line1 }} {{ addr.line2 }}</div>
               </div>

@@ -141,6 +141,7 @@ export default {
         };
     },
     async created(){
+        
         var { address_id } = this.$route.query;
         if( address_id ) {
 
@@ -148,6 +149,9 @@ export default {
             this.action_type = 'update';
             await this.get_address_details_service(address_id);
         }
+
+        var { country_code } = this.store.user_data;
+        this.country_code = country_code;
     },
     methods: {
         async get_address_details_service(address_id){
