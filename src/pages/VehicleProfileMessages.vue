@@ -121,6 +121,9 @@ export default {
         },
         async get_messages(vehicle_id) {
             var res = await this.$api.get("/vehicle-profile-messages/" + vehicle_id);
+            
+            if( res.status === 403 ) this.go_back();
+
             if (res.status === 200) {
                 this.conversation_messages = res.data?.conversation_messages || [];
                 this.vehicle_owner_detail = res.data?.vehicle_owner_detail || {};
@@ -171,15 +174,14 @@ export default {
                 this.flush_queue();
                 this.start_heart_beat();
 
-                this.send_data_to_ws({ vehicle_id: this.vehicle_id, type: "subscribe" });
+                this.send_data_to_ws({ vehicle_id: this.vehicle_id, type: "vehicle_profile_chat_room_subscribe" });
             };
 
             this.socket.onmessage = (event) => {
                 try {
                     var payload = JSON.parse(event.data);
-
                     var is_inserted = this.conversation_messages.find(function(item){ return item._id === payload._id});
-                    if( !is_inserted && payload?.conversation_id ) this.conversation_messages.push(payload);
+                    if( !is_inserted && payload.conversation_id ) this.conversation_messages.push(payload);
                 } catch (err) {
                     console.error(err);
                 }

@@ -203,8 +203,12 @@ export default {
             var s = (val === null || val === undefined) ? "" : String(val).trim();
             if (!s || s === "-") return;
             copyToClipboard(s)
-                .then(() => { this.$q.notify({ type: "positive", message: okMsg, timeout: 1200, position: "top" }); })
-                .catch(() => { this.$q.notify({ type: "negative", message: "Copy failed", timeout: 1400, position: "top" }); });
+                .then(() => { 
+                    //this.$q.notify({ type: "positive", message: okMsg, timeout: 1200, position: "top" }); 
+                })
+                .catch(() => { 
+                    //this.$q.notify({ type: "negative", message: "Copy failed", timeout: 1400, position: "top" }); 
+                });
         }
     }
 }
